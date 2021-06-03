@@ -15,10 +15,10 @@ namespace Demo.Pages
         private Guid parent;
         private Guid child;
 
-        protected override void OnInitialized()
+        protected override async Task OnInitializedAsync()
         {
-            base.OnInitialized();
-
+            await base.OnInitializedAsync();
+                        
             var data = new TeraWord.Blazor.MapD3.Data();
 
             var items = (new[] {
@@ -69,11 +69,11 @@ namespace Demo.Pages
                 node.Header = item.TemperatureSensorValue.ToString();
                 node.Footer = item.LanBandwidthUtilization.ToString();
 
-                node.Data = new
-                {
-                    Pecore = 5,
-                    Capre = 2
-                };
+                //node.Data = new
+                //{
+                //    Pecore = 5,
+                //    Capre = 2
+                //};
             }
 
             Data = data.Compile();

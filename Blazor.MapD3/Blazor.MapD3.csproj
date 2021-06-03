@@ -6,7 +6,7 @@
     <Product>MapD3</Product>
     <Authors>Marcello Marcellino</Authors>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.0.0</Version>
+    <Version>1.0.1</Version>
     <RootNamespace>TeraWord.Blazor.MapD3</RootNamespace>
     <AssemblyName>TeraWord.Blazor.MapD3</AssemblyName>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>

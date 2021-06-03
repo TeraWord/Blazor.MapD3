@@ -116,14 +116,16 @@ MapD3.prototype.Load = function (map) {
 };
 
 MapD3.prototype.LoadGraph = function (map, graph) {
+    map.Svg.selectAll("*").remove();
+
+    if (graph == null) return;
+
     map.Cola.nodes(graph.nodes)
         .links(graph.links)
         //.groups(graph.groups)
         .jaccardLinkLengths(60, 0.8)
         .start(30, 30, 30);
-
-    map.Svg.selectAll("*").remove();
-
+    
     map.Links = map.Svg.selectAll(".link")
         .data(graph.links)
         .enter().append("line")
