@@ -17,11 +17,11 @@ namespace TeraWord.Blazor.MapD3
             {
                 var child = Nodes[contChild];
 
-                if (!String.IsNullOrEmpty(child.Parent))
+                foreach (var parent in child.Parents)
                 {
                     for (int contParent = 0; contParent < Nodes.Count; contParent++)
                     {
-                        if ((contChild != contParent) && (Nodes[contParent].Code == child.Parent))
+                        if ((contChild != contParent) && (Nodes[contParent].Code == parent))
                         {
                             var foundIn = from l in Links where l.Source == contChild && l.Target == contParent select l;
                             var foundOut = from l in Links where l.Source == contParent && l.Target == contChild select l;
@@ -111,21 +111,15 @@ namespace TeraWord.Blazor.MapD3
             return group;
         }
 
-        public Node AddNode(string code, string name, string parentCode, string groupCode)
+        public Node NewNode(string code, string parent)
         {
-            code = code.Trim().ToUpper();
-            if (!String.IsNullOrEmpty(parentCode)) parentCode = parentCode.Trim().ToUpper();
-            if (!String.IsNullOrEmpty(groupCode)) groupCode = groupCode.Trim().ToUpper();
-
             Node node = null;
-            int nodeId = 0;
 
             for (int cont = 0; cont < Nodes.Count; cont++)
             {
                 if (Nodes[cont].Code == code)
                 {
                     node = Nodes[cont];
-                    nodeId = cont;
                     break;
                 }
             }
@@ -133,15 +127,11 @@ namespace TeraWord.Blazor.MapD3
             if (node == null)
             {
                 node = new Node();
-                node.Code = code;
-
+                node.Code = code; 
                 Nodes.Add(node);
-                nodeId = Nodes.Count - 1;
             }
 
-            node.Name = name;
-            node.Parent = parentCode;
-            node.Group = groupCode;
+            if (!node.Parents.Contains(parent)) node.Parents.Add(parent);
 
             return node;
         }

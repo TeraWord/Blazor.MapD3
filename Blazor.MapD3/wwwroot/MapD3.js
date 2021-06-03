@@ -25,19 +25,31 @@ export function MapD3Update(data) {
 
 function MapD3OnInternalNodeClick(e) {
     var node = {
-        ID: e.id,
         Code: e.code,
-        Name: e.name,
-        Parent: e.parent,
+        Label: e.label,
+        Parents: e.parents,
         Group: e.group,
-        Hint: e.hint,
+        Tooltip: e.tooltip,
         Color: e.color,
         Header: e.header,
         Footer: e.footer,
         Data: e.data
     };
 
-    MapD3Instance.invokeMethodAsync('MapD3OnInternalNodeClick', node);
+    _MapD3Instance.invokeMethodAsync('OnInternalNodeClick', node);
+}
+
+function MapD3ShowTooltip(evt, node) {
+    let tooltip = document.getElementById("d3tooltip");
+    tooltip.innerHTML = node.tooltip;
+    tooltip.style.display = "block";
+    tooltip.style.left = evt.pageX - 20 + 'px';
+    tooltip.style.top = evt.pageY - 30 + 'px';
+}
+
+function MapD3HideTooltip() {
+    var tooltip = document.getElementById("d3tooltip");
+    tooltip.style.display = "none";
 }
 
 /* -- svg-panzoom integration -------------------------------------------------------------------------- */
@@ -136,7 +148,7 @@ MapD3.prototype.LoadGraph = function (map, graph) {
         .enter().append("rect")
         .attr("class", "d3node")
         .attr("width", function (d) {
-            d.width = map.ComputedTextLength(map, d.name) + 10;
+            d.width = map.ComputedTextLength(map, d.label) + 10;
             return d.width;
         })
         .attr("height", function (d) {
@@ -147,10 +159,11 @@ MapD3.prototype.LoadGraph = function (map, graph) {
         .style("fill", function (d) {
             return d.color;
         })
-        .on("mouseover", function (d, i) {
-            map.OnMouseOver(map, d);
+        .on("mouseover", function (d) {
+            map.OnMouseOver(d3.event, map, d);
         })
         .on("mouseout", function (d, i) {
+            MapD3HideTooltip();
             map.OnMouseOut(map, d);
         })
         .on("click", function (d, i) {
@@ -161,7 +174,7 @@ MapD3.prototype.LoadGraph = function (map, graph) {
     map.Labels = map.Svg.selectAll(".label")
         .data(graph.nodes).enter()
         .append("text").attr("class", "d3label") 
-        .text(function (d) { return d.name; });
+        .text(function (d) { return d.label; });
 
     map.LabelsHeader = map.Svg.selectAll(".label")
         .data(graph.nodes).enter()
@@ -232,7 +245,7 @@ MapD3.prototype.UpdateGraph = function (map, graph) {
 
         nodes.filter(function (d) { return d.code === code; })
             .attr("width", function (d) {
-                d.width = map.ComputedTextLength(map, node.name) + 10;
+                d.width = map.ComputedTextLength(map, node.label) + 10;
                 return d.width;
             })
             .style("fill", function (d) {
@@ -244,8 +257,8 @@ MapD3.prototype.UpdateGraph = function (map, graph) {
 
         labels.filter(function (d) { return d.code === code; })
             .text(function (d) {
-                d.name = node.name;
-                return d.name;
+                d.label = node.label;
+                return d.label;
             });
 
         labelsHeader.filter(function (d) { return d.code === code; })
@@ -275,8 +288,9 @@ MapD3.prototype.Redraw = function (map, transition) {
     (transition ? map.Vis.transition() : map.Vis).attr("transform", map.transform);
 };
 
-MapD3.prototype.OnMouseOver = function (map, node) {
+MapD3.prototype.OnMouseOver = function (evt, map, node) {
     if (node === null) return;
+    MapD3ShowTooltip(evt, node);
 };
 
 MapD3.prototype.OnMouseOut = function (map, node) {

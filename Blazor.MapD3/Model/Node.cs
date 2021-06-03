@@ -1,18 +1,18 @@
-﻿namespace TeraWord.Blazor.MapD3
-{
-    public class Node
-    {
-        public string ID { get; set; }
+﻿using System.Collections.Generic;
 
+namespace TeraWord.Blazor.MapD3
+{
+    public sealed class Node
+    {
         public string Code { get; set; }
 
-        public string Name { get; set; }
+        public string Label { get; set; }
 
-        public string Parent { get; set; }
+        public List<string> Parents { get; set; } = new();
 
         public string Group { get; set; }
 
-        public string Hint { get; set; }
+        public string Tooltip { get; set; }
 
         public string Color { get; set; }
 

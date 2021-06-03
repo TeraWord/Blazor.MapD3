@@ -23,9 +23,9 @@ namespace Demo.Pages
 
             var items = (new[] {
                 new {
-                    ID = root,
-                    Name = "Root",
-                    ParentID = Guid.Empty,
+                    Code = root,
+                    Label = "Root",
+                    Parent = Guid.Empty,
                     Description = "Descrizione",
                     PhysicStatusCode = 0,
                     TemperatureSensorValue = (int?)36,
@@ -37,9 +37,9 @@ namespace Demo.Pages
 
             items.Add(new
             {
-                ID = parent,
-                Name = "Perent",
-                ParentID = root,
+                Code = parent,
+                Label = "Perent",
+                Parent = root,
                 Description = "Descrizione",
                 PhysicStatusCode = 1,
                 TemperatureSensorValue = (int?)null,
@@ -50,9 +50,20 @@ namespace Demo.Pages
 
             items.Add(new
             {
-                ID = child,
-                Name = "Child",
-                ParentID = parent,
+                Code = child,
+                Label = "Child",
+                Parent = parent,
+                Description = "Descrizione",
+                PhysicStatusCode = 2,
+                TemperatureSensorValue = (int?)null,
+                LanBandwidthUtilization = (int?)null
+            });
+
+            items.Add(new
+            {
+                Code = child,
+                Label = "Child",
+                Parent = root,
                 Description = "Descrizione",
                 PhysicStatusCode = 2,
                 TemperatureSensorValue = (int?)null,
@@ -61,10 +72,9 @@ namespace Demo.Pages
 
             foreach (var item in items)
             {
-                var node = data.AddNode(item.ID.ToString(), item.Name, item.ParentID.ToString(), null);
-
-                node.ID = item.ID.ToString();
-                node.Hint = item.Name + " - " + item.Description;
+                var node = data.NewNode(item.Code.ToString(), item.Parent.ToString());
+                node.Label = item.Label;
+                node.Tooltip = item.Label + " - " + item.Description;
                 node.Color = item.PhysicStatusCode switch { 0 => "red", 1 => "green", 2 => "blue", _ => "black" };
                 node.Header = item.TemperatureSensorValue.ToString();
                 node.Footer = item.LanBandwidthUtilization.ToString();
@@ -81,7 +91,8 @@ namespace Demo.Pages
 
         private async Task OnNodeClick(Node node)
         {
-            Console.WriteLine(JsonSerializer.Serialize(node, new JsonSerializerOptions { WriteIndented = true }));
+            var json = JsonSerializer.Serialize(node, new JsonSerializerOptions { WriteIndented = true });
+            Console.WriteLine(json);
             await Task.CompletedTask;
         }
 
@@ -89,10 +100,10 @@ namespace Demo.Pages
         {
             parent = Guid.NewGuid();
 
-            var node = Data.AddNode($"{parent}", "Parent", $"{root}", null);
+            var node = Data.NewNode($"{parent}", $"{root}");
 
-            node.ID = $"{parent}";
-            node.Hint = node.Name + " - " + "Descrizione";
+            node.Label = "Parent";
+            node.Tooltip = node.Label + " - " + "Descrizione";
             node.Color = 1 switch { 0 => "red", 1 => "green", 2 => "blue", _ => "black" };
 
             Data = Data.Compile();
@@ -102,10 +113,10 @@ namespace Demo.Pages
         {
             child = Guid.NewGuid();
 
-            var node = Data.AddNode($"{child}", "Parent", $"{parent}", null);
+            var node = Data.NewNode($"{child}", $"{parent}");
 
-            node.ID = $"{child}";
-            node.Hint = node.Name + " - " + "Descrizione";
+            node.Label = "Parent";
+            node.Tooltip = node.Label + " - " + "Descrizione";
             node.Color = 1 switch { 0 => "red", 1 => "green", 2 => "blue", _ => "black" };
 
             parent = child;
@@ -117,12 +128,18 @@ namespace Demo.Pages
         {
             child = Guid.NewGuid();
 
-            var node = Data.AddNode($"{child}", "Child", $"{parent}", null);
+            var node = Data.NewNode($"{child}", $"{parent}");
 
-            node.ID = $"{child}";
-            node.Hint = node.Name + " - " + "Descrizione";
+            node.Label = "Child";
+            node.Tooltip = node.Label + " - " + "Descrizione";
             node.Color = 2 switch { 0 => "red", 1 => "green", 2 => "blue", _ => "black" };
 
+            Data = Data.Compile();
+        }
+
+        private void OnLinkClick(dynamic e)
+        {
+            Data.NewNode($"{child}", $"{parent}");
             Data = Data.Compile();
         }
     }
