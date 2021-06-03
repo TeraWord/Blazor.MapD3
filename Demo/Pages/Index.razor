@@ -1,0 +1,19 @@
+﻿@page "/"
+
+<h1>TeraWord MapD3</h1>
+
+<div style="border:1px solid silver;">
+    <MapD3 ID="MapID00001"
+           ZoomEnabled=true
+           ShowControls=true
+           Width=1024
+           Height=500
+           OnNodeClick=OnNodeClick
+           Data=Data />
+</div>
+
+<br />
+
+<button class="btn btn-danger" @onclick=OnRootClick>root</button>
+<button class="btn btn-success" @onclick=OnParentClick>last parent</button>
+<button class="btn btn-primary" @onclick=OnChildClick>last child</button> 

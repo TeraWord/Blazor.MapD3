@@ -1,0 +1,52 @@
+﻿.d3node {
+    stroke: silver;
+    stroke-width: 1.5px;
+    cursor: pointer;
+}
+
+.d3link {
+    stroke: silver;
+    stroke-width: 1px;
+}
+
+.d3label {
+    fill: white;
+    color: white;
+    font-family: Verdana;
+    font-size: 7px;
+    text-anchor: middle;
+    cursor: pointer;
+    pointer-events: none;
+}
+
+.d3labelHeader {
+    fill: #006;
+    font-family: Verdana;
+    font-size: 6px;
+    font-weight: bold;
+    text-anchor: middle;
+    cursor: pointer;
+    pointer-events: none;
+    fill: silver;
+}
+
+.d3labelFooter {
+    fill: #006;
+    font-family: Verdana;
+    font-size: 6px;
+    font-weight: bold;
+    text-anchor: middle;
+    cursor: pointer;
+    pointer-events: none;
+    fill: silver;
+}
+
+.d3labelBold {
+    fill: #006;
+    font-family: Verdana;
+    font-size: 6px;
+    font-weight: bold;
+    text-anchor: middle;
+    cursor: pointer;
+    pointer-events: none;
+}

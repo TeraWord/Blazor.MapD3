@@ -1,0 +1,32 @@
+{
+  "version": "1.0",
+  "defaultProvider": "cdnjs",
+  "libraries": [
+    {
+      "library": "d3@5.16.0",
+      "destination": "wwwroot/lib/d3/"
+    },
+    {
+      "provider": "jsdelivr",
+      "library": "webcola@3.4.0",
+      "destination": "wwwroot/lib/",
+      "files": [
+        "WebCola/cola.js",
+        "WebCola/cola.min.js"
+      ]
+    },
+    {
+      "provider": "jsdelivr",
+      "library": "svg-pan-zoom@3.6.1",
+      "destination": "wwwroot/lib/svg-pan-zoom/",
+      "files": [
+        "dist/svg-pan-zoom.js",
+        "dist/svg-pan-zoom.min.js"
+      ]
+    },
+    {
+      "library": "jquery@3.6.0",
+      "destination": "wwwroot/lib/jquery/"
+    }
+  ]
+}
