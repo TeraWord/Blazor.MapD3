@@ -27,9 +27,9 @@ namespace Demo.Pages
                     Label = "Root",
                     Parent = Guid.Empty,
                     Description = "Descrizione",
-                    PhysicStatusCode = 0,
-                    TemperatureSensorValue = (int?)36,
-                    LanBandwidthUtilization = (int?)0
+                    Status = 0,
+                    Header = "header",
+                    Footer = "footer"
                 }
             }).ToList();
 
@@ -38,12 +38,12 @@ namespace Demo.Pages
             items.Add(new
             {
                 Code = parent,
-                Label = "Perent",
+                Label = "Parent",
                 Parent = root,
                 Description = "Descrizione",
-                PhysicStatusCode = 1,
-                TemperatureSensorValue = (int?)null,
-                LanBandwidthUtilization = (int?)null
+                Status = 1,
+                Header = (string)null,
+                Footer = (string)null
             });
 
             child = Guid.NewGuid();
@@ -54,9 +54,9 @@ namespace Demo.Pages
                 Label = "Child",
                 Parent = parent,
                 Description = "Descrizione",
-                PhysicStatusCode = 2,
-                TemperatureSensorValue = (int?)null,
-                LanBandwidthUtilization = (int?)null
+                Status = 2,
+                Header = (string)null,
+                Footer = (string)null
             });
 
             items.Add(new
@@ -65,9 +65,9 @@ namespace Demo.Pages
                 Label = "Child",
                 Parent = root,
                 Description = "Descrizione",
-                PhysicStatusCode = 2,
-                TemperatureSensorValue = (int?)null,
-                LanBandwidthUtilization = (int?)null
+                Status = 2,
+                Header = (string)null,
+                Footer = (string)null
             });
 
             foreach (var item in items)
@@ -75,14 +75,14 @@ namespace Demo.Pages
                 var node = data.NewNode(item.Code.ToString(), item.Parent.ToString());
                 node.Label = item.Label;
                 node.Tooltip = item.Label + " - " + item.Description;
-                node.Color = item.PhysicStatusCode switch { 0 => "red", 1 => "green", 2 => "blue", _ => "black" };
-                node.Header = item.TemperatureSensorValue.ToString();
-                node.Footer = item.LanBandwidthUtilization.ToString();
+                node.Color = item.Status switch { 0 => "red", 1 => "green", 2 => "blue", _ => "black" };
+                node.Header = item.Header;
+                node.Footer = item.Footer;
 
                 //node.Data = new
                 //{
-                //    Pecore = 5,
-                //    Capre = 2
+                //    Alfa = 5,
+                //    Beta = 2
                 //};
             }
 
@@ -139,7 +139,7 @@ namespace Demo.Pages
 
         private void OnLinkClick(dynamic e)
         {
-            Data.NewNode($"{child}", $"{parent}");
+            Data.NewNode($"{child}", $"{root}");
             Data = Data.Compile();
         }
     }

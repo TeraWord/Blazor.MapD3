@@ -27,7 +27,7 @@
     text-anchor: middle;
     cursor: pointer;
     pointer-events: none;
-    fill: silver;
+    fill: gray;
 }
 
 .d3labelFooter {
@@ -38,13 +38,13 @@
     text-anchor: middle;
     cursor: pointer;
     pointer-events: none;
-    fill: silver;
+    fill: gray;
 }
 
 .d3labelBold {
     fill: #006;
     font-family: Verdana;
-    font-size: 6px;
+    font-size: 7px;
     font-weight: bold;
     text-anchor: middle;
     cursor: pointer;
@@ -57,5 +57,5 @@
     border-radius: 4px;
     padding: 0.25rem 0.5rem;
     color: gray;
-    font: bold 12px tahoma; 
+    font: bold 10px Verdana;
 }
