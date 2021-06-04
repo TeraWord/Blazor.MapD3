@@ -88,27 +88,25 @@ function MapD3(width, height, div, action, onNodeClick) {
         .handleDisconnected(true)
         .size([width, height]);
 
-    this.Outer = d3.select('#' + div)
+    this.Svg = d3.select('#' + div)
         .append("svg")
         .attr("width", "100%")
         .attr("height", height)
-        .attr("id", "svg-" + div)
-        .attr("pointer-events", "all");
+        .attr("id", "svg-" + div);
 
-    this.Zoom = d3.zoom()
-        .scaleExtent([0.1, 32])
-        .translateExtent([[-1000, -1000], [width + 1000, height + 1000]]);
-
-    this.Outer.append('rect')
+    this.Svg.append('rect')
         .attr('width', "100%")
         .attr('height', "100%")
-        .style('fill', 'white')
-        .call(map.Zoom.on("zoom", function (a, b, c, d) {
-            map.Redraw(map, b);
-        }));
+        .style('fill', 'white');
 
-    this.Vis = map.Outer.append('g');
-    this.Svg = map.Vis.append("g");
+    this.Area = map.Svg.append("g");
+
+    this.Svg.call(d3.zoom()
+        .extent([[0, 0], [width, height]])
+        .scaleExtent([1, 8])
+        .on("zoom", function () {
+            map.Area.attr("transform", d3.event.transform);
+        }));
 }
 
 MapD3.prototype.Load = function (map) {
@@ -128,7 +126,7 @@ MapD3.prototype.Load = function (map) {
 };
 
 MapD3.prototype.LoadGraph = function (map, graph) {
-    map.Svg.selectAll("*").remove();
+    map.Area.selectAll("*").remove();
 
     if (graph == null) return;
 
@@ -138,12 +136,12 @@ MapD3.prototype.LoadGraph = function (map, graph) {
         .jaccardLinkLengths(60, 0.8)
         .start(30, 30, 30);
     
-    map.Links = map.Svg.selectAll(".link")
+    map.Links = map.Area.selectAll(".link")
         .data(graph.links)
         .enter().append("line")
         .attr("class", "d3link");
 
-    map.Nodes = map.Svg.selectAll(".node")
+    map.Nodes = map.Area.selectAll(".node")
         .data(graph.nodes)
         .enter().append("rect")
         .attr("class", "d3node")
@@ -162,8 +160,7 @@ MapD3.prototype.LoadGraph = function (map, graph) {
         .on("mouseover", function (d) {
             map.OnMouseOver(d3.event, map, d);
         })
-        .on("mouseout", function (d, i) {
-            MapD3HideTooltip();
+        .on("mouseout", function (d, i) {            
             map.OnMouseOut(map, d);
         })
         .on("click", function (d, i) {
@@ -171,18 +168,18 @@ MapD3.prototype.LoadGraph = function (map, graph) {
         })
         .call(map.Cola.drag);
 
-    map.Labels = map.Svg.selectAll(".label")
+    map.Labels = map.Area.selectAll(".label")
         .data(graph.nodes).enter()
         .append("text").attr("class", "d3label") 
         .text(function (d) { return d.label; });
 
-    map.LabelsHeader = map.Svg.selectAll(".label")
+    map.LabelsHeader = map.Area.selectAll(".label")
         .data(graph.nodes).enter()
         .filter(function (d) { return d.header !== null; })
         .append("text").attr("class", "d3labelHeader")
         .text(function (d) { return d.header; });
 
-    map.LabelsFooter = map.Svg.selectAll(".label")
+    map.LabelsFooter = map.Area.selectAll(".label")
         .data(graph.nodes).enter()
         .filter(function (d) { return d.footer !== null; })
         .append("text").attr("class", "d3labelFooter")
@@ -283,18 +280,14 @@ MapD3.prototype.UpdateGraph = function (map, graph) {
     });    
 };
 
-MapD3.prototype.Redraw = function (map, transition) {
-    if (map.IsMouseDown) return;
-    (transition ? map.Vis.transition() : map.Vis).attr("transform", map.transform);
-};
-
 MapD3.prototype.OnMouseOver = function (evt, map, node) {
     if (node === null) return;
     MapD3ShowTooltip(evt, node);
 };
 
 MapD3.prototype.OnMouseOut = function (map, node) {
-    if (node === null) return;
+    MapD3HideTooltip();
+    if (node === null) return;    
 };
 
 MapD3.prototype.OnMouseClick = function (map, node) {
@@ -305,7 +298,7 @@ MapD3.prototype.OnMouseClick = function (map, node) {
 MapD3.prototype.ComputedTextLength = function (map, text) {
     var id = "ERTWERTWERTWERTWERTWE";
 
-    var m = map.Svg
+    var m = map.Area
         .append("text")
         .attr("id", id)
         .attr("class", "d3label")

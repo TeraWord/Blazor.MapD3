@@ -16,15 +16,6 @@
       ]
     },
     {
-      "provider": "jsdelivr",
-      "library": "svg-pan-zoom@3.6.1",
-      "destination": "wwwroot/lib/svg-pan-zoom/",
-      "files": [
-        "dist/svg-pan-zoom.js",
-        "dist/svg-pan-zoom.min.js"
-      ]
-    },
-    {
       "library": "jquery@3.6.0",
       "destination": "wwwroot/lib/jquery/"
     }

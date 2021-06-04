@@ -55,7 +55,7 @@ namespace TeraWord.Blazor.MapD3
 
                 await MapD3Module.InvokeVoidAsync("MapD3Init", ID, Width, Height, MapD3Instance, Service);
 
-                await MapD3Module.InvokeVoidAsync("MapD3InitPanZoom", ID, ZoomEnabled, ShowControls);
+                //await MapD3Module.InvokeVoidAsync("MapD3InitPanZoom", ID, ZoomEnabled, ShowControls);
 
                 //await MapD3Module.InvokeVoidAsync("MapD3Load", Data);
             }
