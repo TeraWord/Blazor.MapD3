@@ -61,13 +61,24 @@ namespace Demo.Pages
 
             items.Add(new
             {
-                Code = child,
-                Label = "Child",
+                Code = Guid.NewGuid(),
+                Label = "Header",
                 Parent = root,
                 Description = "Descrizione",
                 Status = 2,
-                Header = (string)null,
-                Footer = (string)null
+                Header = "JJJJJJ",
+                Footer = "gggggg"
+            });
+
+            items.Add(new
+            {
+                Code = Guid.NewGuid(),
+                Label = "Footer",
+                Parent = root,
+                Description = "Descrizione",
+                Status = 2,
+                Header = "gggggg",
+                Footer = "JJJJJJ"
             });
 
             foreach (var item in items)

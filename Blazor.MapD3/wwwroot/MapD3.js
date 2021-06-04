@@ -8,11 +8,7 @@ export function MapD3Init(div, width, height, instance, service) {
 }
 
 function MapD3Edit() {
-    
-}
 
-function MapD3Refresh() {
-    _MapD3.Update(_MapD3);
 }
 
 export function MapD3Load(data) {
@@ -52,28 +48,6 @@ function MapD3HideTooltip() {
     tooltip.style.display = "none";
 }
 
-/* -- svg-panzoom integration -------------------------------------------------------------------------- */
-
-export function MapD3InitPanZoom(div, zoomEnabled, showControls) {
-    svgPanZoom("#svg-" + div, {
-        zoomEnabled: zoomEnabled,
-        controlIconsEnabled: showControls,
-        fit: true,
-        center: true
-    });
-}
-
-    //document.getElementById('enable').addEventListener('click', function () {
-    //    window.zoomTiger.enableControlIcons();
-    //})
-
-    //document.getElementById('disable').addEventListener('click', function () {
-    //    window.zoomTiger.disableControlIcons();
-    //})
-
-
-/* -----------------------------------------------------------------------------------------------------------------------------  */
-
 function MapD3(width, height, div, action, onNodeClick) {
     this.Width = width;
     this.Height = height;
@@ -94,16 +68,11 @@ function MapD3(width, height, div, action, onNodeClick) {
         .attr("height", height)
         .attr("id", "svg-" + div);
 
-    this.Svg.append('rect')
-        .attr('width', "100%")
-        .attr('height', "100%")
-        .style('fill', 'white');
-
     this.Area = map.Svg.append("g");
 
     this.Svg.call(d3.zoom()
         .extent([[0, 0], [width, height]])
-        .scaleExtent([1, 8])
+        .scaleExtent([0.1, 10.0])
         .on("zoom", function () {
             map.Area.attr("transform", d3.event.transform);
         }));
@@ -114,15 +83,15 @@ MapD3.prototype.Load = function (map) {
     $.getJSON(map.Action, function (graph) {
         LoadGraph(map, graph);
     })
-    .done(function () {
-        console.log("second success");
-    })
-    .fail(function () {
-        console.log("error");
-    })
-    .always(function () {
-        console.log("complete");
-    });
+        .done(function () {
+            console.log("second success");
+        })
+        .fail(function () {
+            console.log("error");
+        })
+        .always(function () {
+            console.log("complete");
+        });
 };
 
 MapD3.prototype.LoadGraph = function (map, graph) {
@@ -135,22 +104,24 @@ MapD3.prototype.LoadGraph = function (map, graph) {
         //.groups(graph.groups)
         .jaccardLinkLengths(60, 0.8)
         .start(30, 30, 30);
-    
+
+    map.DataNodes = graph.nodes;
+
     map.Links = map.Area.selectAll(".link")
         .data(graph.links)
         .enter().append("line")
         .attr("class", "d3link");
 
     map.Nodes = map.Area.selectAll(".node")
-        .data(graph.nodes)
+        .data(map.DataNodes)
         .enter().append("rect")
         .attr("class", "d3node")
         .attr("width", function (d) {
-            d.width = map.ComputedTextLength(map, d.label) + 10;
+            d.width = map.TextWidth(map, d.label, "d3label") + 10;
             return d.width;
         })
         .attr("height", function (d) {
-            d.height = 12;
+            d.height = map.TextHeight(map, d.label, "d3label") + 4;
             return d.height;
         })
         .attr("rx", 5).attr("ry", 5)
@@ -160,27 +131,27 @@ MapD3.prototype.LoadGraph = function (map, graph) {
         .on("mouseover", function (d) {
             map.OnMouseOver(d3.event, map, d);
         })
-        .on("mouseout", function (d, i) {            
+        .on("mouseout", function (d) {
             map.OnMouseOut(map, d);
         })
-        .on("click", function (d, i) {
+        .on("click", function (d) {
             map.OnMouseClick(map, d);
         })
         .call(map.Cola.drag);
 
     map.Labels = map.Area.selectAll(".label")
-        .data(graph.nodes).enter()
-        .append("text").attr("class", "d3label") 
+        .data(map.DataNodes).enter()
+        .append("text").attr("class", "d3label")
         .text(function (d) { return d.label; });
 
     map.LabelsHeader = map.Area.selectAll(".label")
-        .data(graph.nodes).enter()
+        .data(map.DataNodes).enter()
         .filter(function (d) { return d.header !== null; })
         .append("text").attr("class", "d3labelHeader")
         .text(function (d) { return d.header; });
 
     map.LabelsFooter = map.Area.selectAll(".label")
-        .data(graph.nodes).enter()
+        .data(map.DataNodes).enter()
         .filter(function (d) { return d.footer !== null; })
         .append("text").attr("class", "d3labelFooter")
         .text(function (d) { return d.footer; });
@@ -202,16 +173,22 @@ MapD3.prototype.LoadGraph = function (map, graph) {
 
         map.Labels
             .attr("x", function (d) { return d.x; })
-            .attr("y", function (d) { return d.y + 3; });
+            .attr("y", function (d) { return d.y + 2.5; });
 
         map.LabelsHeader
             .attr("x", function (d) { return d.x; })
-            .attr("y", function (d) { return d.y - 8; });
+            .attr("y", function (d) { return d.y - map.TextHeight(map, d.header, "d3header") + 9.5; });
 
         map.LabelsFooter
             .attr("x", function (d) { return d.x; })
-            .attr("y", function (d) { return d.y + 12; });
+            .attr("y", function (d) { return d.y + map.TextHeight(map, d.footer, "d3footer") - 6; });
     });
+};
+
+MapD3.prototype.AddNode = function (map, nodes, node) {
+    map.DataNodes.push(node);
+
+    map.Cola.refresh();
 };
 
 MapD3.prototype.Update = function (map) {
@@ -219,15 +196,15 @@ MapD3.prototype.Update = function (map) {
     $.getJSON(map.Action, function (graph) {
         UpdateGraph(map, graph);
     })
-    .done(function () {
-        console.log("second success");
-    })
-    .fail(function () {
-        console.log("error");
-    })
-    .always(function () {
-        console.log("complete");
-    });
+        .done(function () {
+            console.log("second success");
+        })
+        .fail(function () {
+            console.log("error");
+        })
+        .always(function () {
+            console.log("complete");
+        });
 };
 
 MapD3.prototype.UpdateGraph = function (map, graph) {
@@ -242,7 +219,7 @@ MapD3.prototype.UpdateGraph = function (map, graph) {
 
         nodes.filter(function (d) { return d.code === code; })
             .attr("width", function (d) {
-                d.width = map.ComputedTextLength(map, node.label) + 10;
+                d.width = map.TextWidth(map, node.label, "d3label") + 10;
                 return d.width;
             })
             .style("fill", function (d) {
@@ -277,7 +254,13 @@ MapD3.prototype.UpdateGraph = function (map, graph) {
                     return "";
                 }
             });
-    });    
+
+        var foundNode = nodes.filter(function (d) { return d.code === code; });
+
+        if (foundNode._groups[0].length === 0) {
+            map.AddNode(map, nodes, node);
+        }
+    });
 };
 
 MapD3.prototype.OnMouseOver = function (evt, map, node) {
@@ -285,9 +268,9 @@ MapD3.prototype.OnMouseOver = function (evt, map, node) {
     MapD3ShowTooltip(evt, node);
 };
 
-MapD3.prototype.OnMouseOut = function (map, node) {
+MapD3.prototype.OnMouseOut = function (node) {
     MapD3HideTooltip();
-    if (node === null) return;    
+    if (node === null) return;
 };
 
 MapD3.prototype.OnMouseClick = function (map, node) {
@@ -295,18 +278,40 @@ MapD3.prototype.OnMouseClick = function (map, node) {
     map.OnNodeClick(node);
 };
 
-MapD3.prototype.ComputedTextLength = function (map, text) {
+MapD3.prototype.TextWidth = function (map, text, cssClass) {
     var id = "ERTWERTWERTWERTWERTWE";
 
     var m = map.Area
         .append("text")
         .attr("id", id)
-        .attr("class", "d3label")
+        .attr("class", cssClass) // "d3label")
         .style("fill", "transparent");
 
-    var length = m.text(text).node().getComputedTextLength();
+    //var length = m.text(text).node().getComputedTextLength();
+
+    var box = m.text(text).node().getBBox();
+    var width = box.width;
 
     d3.select("#ERTWERTWERTWERTWERTWE").remove();
 
-    return length;
+    return width;
+};
+
+MapD3.prototype.TextHeight = function (map, text, cssClass) {
+    var id = "ERTWERTWERTWERTWERTWE";
+
+    var m = map.Area
+        .append("text")
+        .attr("id", id)
+        .attr("class", cssClass) // "d3label")
+        .style("fill", "transparent");
+
+    //var length = m.text(text).node().getComputedTextLength();
+
+    var box = m.text(text).node().getBBox();
+    var height = box.height;
+
+    d3.select("#ERTWERTWERTWERTWERTWE").remove();
+
+    return height;
 };
