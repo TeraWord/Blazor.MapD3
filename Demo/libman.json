@@ -3,17 +3,8 @@
   "defaultProvider": "cdnjs",
   "libraries": [
     {
-      "library": "d3@5.16.0",
+      "library": "d3@6.7.0",
       "destination": "wwwroot/lib/d3/"
-    },
-    {
-      "provider": "jsdelivr",
-      "library": "webcola@3.4.0",
-      "destination": "wwwroot/lib/",
-      "files": [
-        "WebCola/cola.js",
-        "WebCola/cola.min.js"
-      ]
     },
     {
       "library": "jquery@3.6.0",

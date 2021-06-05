@@ -15,6 +15,8 @@ namespace Demo.Pages
         private Guid parent;
         private Guid child;
 
+        private string NodeJson { get; set; }
+
         protected override async Task OnInitializedAsync()
         {
             await base.OnInitializedAsync();
@@ -92,7 +94,7 @@ namespace Demo.Pages
         private async Task OnNodeClick(Node node)
         {
             var json = JsonSerializer.Serialize(node, new JsonSerializerOptions { WriteIndented = true });
-            Console.WriteLine(json);
+            NodeJson = json;
             await Task.CompletedTask;
         }
 

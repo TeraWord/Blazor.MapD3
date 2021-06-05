@@ -276,8 +276,8 @@ var D3StyleLayoutAdaptor = (function (_super) {
                 var drag = d3Context.drag()
                     .subject(layout_1.Layout.dragOrigin)
                     .on("start.d3adaptor", layout_1.Layout.dragStart)
-                    .on("drag.d3adaptor", function (d) {
-                    layout_1.Layout.drag(d, d3Context.event);
+                    .on("drag.d3adaptor", function (evt, d) {
+                        layout_1.Layout.drag(d, evt); 
                     d3layout.resume();
                 })
                     .on("end.d3adaptor", layout_1.Layout.dragEnd);
@@ -2304,7 +2304,7 @@ var Layout = (function () {
     Layout.linkId = function (e) {
         return Layout.getSourceIndex(e) + "-" + Layout.getTargetIndex(e);
     };
-    Layout.dragStart = function (d) {
+    Layout.dragStart = function (evt, d) {
         if (isGroup(d)) {
             Layout.storeOffset(d, Layout.dragOrigin(d));
         }
@@ -2330,7 +2330,7 @@ var Layout = (function () {
             d.groups.forEach(function (g) { return Layout.storeOffset(g, origin); });
         }
     };
-    Layout.dragOrigin = function (d) {
+    Layout.dragOrigin = function (evt, d) {
         if (isGroup(d)) {
             return {
                 x: d.bounds.cx(),
@@ -2360,7 +2360,7 @@ var Layout = (function () {
             d.py = position.y;
         }
     };
-    Layout.dragEnd = function (d) {
+    Layout.dragEnd = function (evt, d) {
         if (isGroup(d)) {
             if (typeof d.leaves !== 'undefined') {
                 d.leaves.forEach(function (v) {
@@ -2377,11 +2377,11 @@ var Layout = (function () {
             d.fixed &= ~6;
         }
     };
-    Layout.mouseOver = function (d) {
+    Layout.mouseOver = function (evt, d) {
         d.fixed |= 4;
         d.px = d.x, d.py = d.y;
     };
-    Layout.mouseOut = function (d) {
+    Layout.mouseOut = function (evt, d) {
         d.fixed &= ~4;
     };
     return Layout;

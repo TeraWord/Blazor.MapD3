@@ -104,8 +104,8 @@ function MapD3(width, height, div, action, onNodeClick) {
     this.Svg.call(d3.zoom()
         .extent([[0, 0], [width, height]])
         .scaleExtent([1, 8])
-        .on("zoom", function () {
-            map.Area.attr("transform", d3.event.transform);
+        .on("zoom", function (evt) {
+            map.Area.attr("transform", evt.transform);
         }));
 }
 
@@ -153,18 +153,21 @@ MapD3.prototype.LoadGraph = function (map, graph) {
             d.height = 12;
             return d.height;
         })
-        .attr("rx", 5).attr("ry", 5)
+        .attr("x", function (d) { return d.x - d.width / 2; })
+        .attr("y", function (d) { return d.y - d.height / 2; })
+        .attr("rx", 5)
+        .attr("ry", 5)
         .style("fill", function (d) {
             return d.color;
         })
-        .on("mouseover", function (d) {
-            map.OnMouseOver(d3.event, map, d);
+        .on("mouseover", function (evt, node) {
+            map.OnMouseOver(evt, map, node);
         })
-        .on("mouseout", function (d, i) {            
-            map.OnMouseOut(map, d);
+        .on("mouseout", function (evt, node) {
+            map.OnMouseOut(evt, map, node);
         })
-        .on("click", function (d, i) {
-            map.OnMouseClick(map, d);
+        .on("click", function (evt, node) {
+            map.OnMouseClick(evt, map, node);
         })
         .call(map.Cola.drag);
 
@@ -285,12 +288,12 @@ MapD3.prototype.OnMouseOver = function (evt, map, node) {
     MapD3ShowTooltip(evt, node);
 };
 
-MapD3.prototype.OnMouseOut = function (map, node) {
+MapD3.prototype.OnMouseOut = function (evt, map, node) {
     MapD3HideTooltip();
     if (node === null) return;    
 };
 
-MapD3.prototype.OnMouseClick = function (map, node) {
+MapD3.prototype.OnMouseClick = function (evt, map, node) {
     if (node === null) return;
     map.OnNodeClick(node);
 };
