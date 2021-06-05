@@ -17,6 +17,8 @@ namespace Demo.Pages
 
         private string NodeJson { get; set; }
 
+        private MapD3 MapD3 { get; set; }
+
         protected override async Task OnInitializedAsync()
         {
             await base.OnInitializedAsync();
@@ -67,6 +69,17 @@ namespace Demo.Pages
                 Label = "Child",
                 Parent = root,
                 Description = "Descrizione",
+                Status = 2,
+                Header = (string)null,
+                Footer = (string)null
+            });
+
+            items.Add(new
+            {
+                Code = Guid.NewGuid(),
+                Label = "Lonely",
+                Parent = Guid.Empty,
+                Description = "Solo",
                 Status = 2,
                 Header = (string)null,
                 Footer = (string)null
@@ -143,6 +156,36 @@ namespace Demo.Pages
         {
             Data.NewNode($"{child}", $"{root}");
             Data = Data.Compile();
+        }
+
+        private void OnLonelyClick(dynamic e)
+        {
+            child = Guid.NewGuid();
+
+            var node = Data.NewNode($"{child}", null);
+
+            node.Label = "Lonely";
+            node.Tooltip = node.Label + " - " + "Lonely";
+            node.Color = 2 switch { 0 => "red", 1 => "green", 2 => "blue", _ => "black" };
+
+            Data = Data.Compile();
+        }
+
+        private void OnRemoveClick(dynamic e)
+        {
+            var node = Data.Nodes.FirstOrDefault(x => Guid.Parse(x.Code).Equals(child));
+            
+            if (node is not null)
+            {
+                Data.Nodes.Remove(node);
+                child = Guid.Parse(Data.Nodes.Last().Code);
+                Data = Data.Compile();
+            }
+        }
+
+        private async void OnZoomToFitClick(dynamic e)
+        {
+            await MapD3.ZoomToFit();
         }
     }
 }

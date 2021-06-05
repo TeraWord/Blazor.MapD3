@@ -3,7 +3,8 @@
 <h1>TeraWord MapD3</h1>
 
 <div style="border:1px solid silver;">
-    <MapD3 ID="MapID00001"
+    <MapD3 @ref=MapD3
+           ID="MapID00001"
            ZoomEnabled=true
            ShowControls=true
            Width=1024
@@ -14,12 +15,16 @@
 
 <br />
 
-<button class="btn btn-danger" @onclick=OnRootClick>root</button>
-<button class="btn btn-success" @onclick=OnParentClick>parent</button>
+<button class="btn btn-primary" @onclick=OnRootClick>root</button>
+<button class="btn btn-primary" @onclick=OnParentClick>parent</button>
 <button class="btn btn-primary" @onclick=OnChildClick>child</button>
-<button class="btn btn-warning" @onclick=OnLinkClick>link</button> 
+<button class="btn btn-primary" @onclick=OnLonelyClick>lonely</button>
+<button class="btn btn-primary" @onclick=OnLinkClick>link</button>
+<button class="btn btn-primary" @onclick=OnRemoveClick>remove</button>
+<button class="btn btn-primary" @onclick=OnZoomToFitClick>zoom to fit</button>
 
-<br /><br />
+<br />
+<br />
 <label>node json:</label>
 <br />
 <code>@NodeJson</code>

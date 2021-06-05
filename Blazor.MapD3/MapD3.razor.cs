@@ -21,7 +21,8 @@ namespace TeraWord.Blazor.MapD3
 
         [Parameter] public int Height { get; set; }
 
-        [Parameter] public Data Data { get; set; }
+        [Parameter] public Data Data { get => _Data; set { _Data = value; _ = Update(); } }
+        private Data _Data;
 
         [Parameter] public bool ZoomEnabled { get; set; }
 
@@ -51,17 +52,9 @@ namespace TeraWord.Blazor.MapD3
                 }
                 if (Instance is null) Instance = DotNetObjectReference.Create(this);
                 if (Module is not null) await Module.InvokeVoidAsync("MapD3Init", ID, Width, Height, Instance, Service);
-
-                //await MapD3Module.InvokeVoidAsync("MapD3InitPanZoom", ID, ZoomEnabled, ShowControls);
-
-                //await MapD3Module.InvokeVoidAsync("MapD3Load", Data);
-            }
-            else
-            {
-                //await MapD3Module.InvokeVoidAsync("MapD3Update", Data);
-            }
-
-            if (Module is not null) await Module.InvokeVoidAsync("MapD3Load", Data);
+        
+                await Update();
+            }   
         }
 
         private async void Clicked()
@@ -78,6 +71,16 @@ namespace TeraWord.Blazor.MapD3
                 style.Append(Style);
                 return style.ToString();
             }
+        }
+
+        public async Task ZoomToFit()
+        {
+            if (Module is not null) await Module.InvokeVoidAsync("MapD3ZoomToFit");
+        }
+
+        public async Task Update()
+        {
+            if (Module is not null) await Module.InvokeVoidAsync("MapD3Update", Data);
         }
 
         public void Dispose()

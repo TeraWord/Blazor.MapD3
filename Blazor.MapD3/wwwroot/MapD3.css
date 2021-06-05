@@ -14,31 +14,36 @@
     color: white;
     font-family: Verdana;
     font-size: 7px;
+    font-weight: bold;
     text-anchor: middle;
     cursor: pointer;
     pointer-events: none;
+    stroke: none;
+    stroke-width: 0;
 }
 
 .d3labelHeader {
     fill: #006;
     font-family: Verdana;
     font-size: 6px;
-    font-weight: bold;
     text-anchor: middle;
     cursor: pointer;
     pointer-events: none;
     fill: gray;
+    stroke: none;
+    stroke-width: 0;
 }
 
 .d3labelFooter {
     fill: #006;
     font-family: Verdana;
-    font-size: 6px;
-    font-weight: bold;
+    font-size: 6px;   
     text-anchor: middle;
     cursor: pointer;
     pointer-events: none;
     fill: gray;
+    stroke: none;
+    stroke-width: 0;
 }
 
 .d3labelBold {

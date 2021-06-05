@@ -11,6 +11,34 @@ namespace TeraWord.Blazor.MapD3
         public List<Link> Links { get; set; } = new List<Link>();
         public List<Group> Groups { get; set; } = new List<Group>();
 
+        public Data() { }
+
+        public Data(IEnumerable<Node> nodes)
+        {
+            Assign(nodes);
+        }
+
+        public void Assign(IEnumerable<Node> nodes)
+        {
+            foreach (var node in nodes)
+            {
+                var item = NewNode(node.Code, null);
+                item.Color = node.Color;
+                item.Data = node.Data;
+                item.Footer = node.Footer;
+                item.Group = node.Group;
+                item.Header = node.Header;
+                item.Label = node.Label;
+                item.Parents = node.Parents;
+                item.Tooltip = node.Tooltip;
+
+                foreach (var parent in node.Parents)
+                    if (!string.IsNullOrWhiteSpace(parent))
+                        if (!item.Parents.Contains(parent))
+                            node.Parents.Add(parent);
+            }
+        }
+
         public Data Compile()
         {
             for (int contChild = 0; contChild < Nodes.Count; contChild++)
@@ -31,7 +59,7 @@ namespace TeraWord.Blazor.MapD3
                                 var link = new Link();
                                 link.Source = contChild;
                                 link.Target = contParent;
-                                link.Code = child.Code;
+                                link.Code = $"{parent}-{child.Code}";
                                 Links.Add(link);
                             }
                         }
@@ -111,7 +139,7 @@ namespace TeraWord.Blazor.MapD3
             return group;
         }
 
-        public Node NewNode(string code, string parent)
+        public Node NewNode(string code, string parent = null)
         {
             Node node = null;
 
@@ -130,8 +158,8 @@ namespace TeraWord.Blazor.MapD3
                 node.Code = code; 
                 Nodes.Add(node);
             }
-
-            if (!node.Parents.Contains(parent)) node.Parents.Add(parent);
+ 
+            if (!string.IsNullOrWhiteSpace(parent)) if (!node.Parents.Contains(parent)) node.Parents.Add(parent);
 
             return node;
         }
