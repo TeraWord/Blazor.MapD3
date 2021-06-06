@@ -13,36 +13,17 @@ namespace TeraWord.Blazor.MapD3
 
         public Data() { }
 
-        public Data(IEnumerable<Node> nodes)
-        {
-            Assign(nodes);
-        }
+        public Data(IEnumerable<Node> nodes) => Assign(nodes);
 
-        public void Assign(IEnumerable<Node> nodes)
-        {
-            foreach (var node in nodes)
-            {
-                var item = NewNode(node.Code, null);
-                item.Color = node.Color;
-                item.Data = node.Data;
-                item.Footer = node.Footer;
-                item.Group = node.Group;
-                item.Header = node.Header;
-                item.Label = node.Label;
-                item.Parents = node.Parents;
-                item.Tooltip = node.Tooltip;
-
-                foreach (var parent in node.Parents)
-                    if (!string.IsNullOrWhiteSpace(parent))
-                        if (!item.Parents.Contains(parent))
-                            node.Parents.Add(parent);
-            }
+        public void Assign(IEnumerable<Node> nodes) 
+        { 
+            foreach (var node in nodes) AddNode(node); 
         }
 
         internal Data Compile()
         {
             Links.Clear();
-            
+
             for (int contChild = 0; contChild < Nodes.Count; contChild++)
             {
                 var child = Nodes[contChild];
@@ -94,17 +75,14 @@ namespace TeraWord.Blazor.MapD3
                 }
             }
 
-            Groups = (from g in Groups where g.Leaves.Count > 0 select g).ToList();
+            //Groups = (from g in Groups where g.Leaves.Count > 0 select g).ToList();
             Links = (from l in Links orderby l.Target, l.Source select l).ToList();
 
             return this;
         }
 
-        public Group AddGroup(string code, string parentCode = null)
+        public Group AddGroup(string code, string parent = null)
         {
-            code = code.Trim().ToUpper();
-            if (!String.IsNullOrEmpty(parentCode)) parentCode = parentCode.Trim().ToUpper();
-
             Group group = null;
             int groupId = 0;
 
@@ -126,11 +104,11 @@ namespace TeraWord.Blazor.MapD3
                 groupId = Groups.Count - 1;
             }
 
-            if (!String.IsNullOrEmpty(parentCode))
+            if (!String.IsNullOrEmpty(parent))
             {
                 for (int cont = 0; cont < Groups.Count; cont++)
                 {
-                    if ((cont != groupId) && (Groups[cont].Code == parentCode))
+                    if ((cont != groupId) && (Groups[cont].Code == parent))
                     {
                         Groups[cont].Groups.Add(groupId);
                         break;
@@ -141,27 +119,61 @@ namespace TeraWord.Blazor.MapD3
             return group;
         }
 
-        public Node NewNode(string code, string parent = null)
+        public Node FindNode(string code)
         {
-            Node node = null;
+            return Nodes?.Where(x => x.Code.Equals(code)).FirstOrDefault();
+        }
 
-            for (int cont = 0; cont < Nodes.Count; cont++)
-            {
-                if (Nodes[cont].Code == code)
-                {
-                    node = Nodes[cont];
-                    break;
-                }
-            }
+        public bool ExistsNode(string code)
+        {
+            return FindNode(code) is not null;
+        }
 
-            if (node == null)
+        public Node AddNode(string code, string parent = null)
+        {
+            var node = FindNode(code);
+
+            if (node is null)
             {
                 node = new Node();
-                node.Code = code; 
+                node.Code = code;
                 Nodes.Add(node);
             }
- 
-            if (!string.IsNullOrWhiteSpace(parent)) if (!node.Parents.Contains(parent)) node.Parents.Add(parent);
+            
+            return AddLink(node.Code, parent);
+        }
+
+        public Node AddNode(Node node)
+        {
+            var result = AddNode(node.Code);
+
+            result.Color = node.Color;
+            result.Data = node.Data;
+            result.Footer = node.Footer;
+            result.Group = node.Group;
+            result.Header = node.Header;
+            result.Label = node.Label;
+            result.Tooltip = node.Tooltip;
+
+            return AddLinks(result.Code, node.Parents);
+        }
+
+        public Node AddLink(string code, string parent)
+        {
+            return AddLinks(code, new string[] { parent });
+        }
+
+        public Node AddLinks(string code, IEnumerable<string> parents)
+        {
+            var node = FindNode(code);
+
+            if (node is not null && parents is not null)
+                foreach (var parent in parents) 
+                    if (!string.IsNullOrWhiteSpace(parent))
+                        if (!node.Parents.Contains(parent))
+                            node.Parents.Add(parent);
+
+            node.Parents = new(node.Parents);
 
             return node;
         }

@@ -9,6 +9,5 @@
         public int Target { get; set; }
 
         public bool Selected { get; set; } = false;
-
     }
 }

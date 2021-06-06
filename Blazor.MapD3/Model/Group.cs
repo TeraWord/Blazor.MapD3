@@ -9,5 +9,7 @@ namespace TeraWord.Blazor.MapD3
         public List<int> Leaves { get; set; } = new List<int>();
 
         public List<int> Groups { get; set; } = new List<int>();
+
+        public string Color { get; set; } 
     }
 }

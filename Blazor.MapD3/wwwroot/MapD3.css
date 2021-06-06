@@ -4,6 +4,15 @@
     cursor: pointer;
 }
 
+.d3group {
+    stroke: silver;
+    stroke-width: 1.5px;
+    cursor: pointer;
+    fill: red;
+    padding: 10rem;
+    opacity: 1;
+}
+
 .d3link {
     stroke: silver;
     stroke-width: 1px;

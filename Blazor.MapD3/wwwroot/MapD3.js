@@ -80,6 +80,24 @@ function NewLinkFromLink(e) {
     };
 }
 
+function NewGroupFromGroup(e) {
+    return {
+        code: e.code,
+        leaves: e.leaves,
+        groups: e.groups,
+        color: e.color
+    };
+}
+
+function FillGroup(e, group) { 
+    group.leaves = e.leaves;
+    group.groups = e.groups;
+    group.color = e.color;
+}
+
+function FillLink(e, link) {
+    link.selected = e.selected;
+}
 
 function FillNode(e, node) {
     node.label = e.label;
@@ -91,7 +109,6 @@ function FillNode(e, node) {
     node.footer = e.footer;
     node.data = e.data;
 }
-
 
 /* -----------------------------------------------------------------------------------------------------------------------------  */
 
@@ -124,11 +141,13 @@ function MapD3(width, height, div, action, onNodeClick) {
 
     this.Layers = map.Svg.append("g");
 
-    this.BaseLayer = map.Layers.append("g");
+    this.GroupLayer = map.Layers.append("g");
+    this.LinkLayer = map.Layers.append("g");
     this.NodeLayer = map.Layers.append("g");
 
     this.Links = [];
     this.Nodes = [];
+    this.Groups = [];
 
     this.Zoom = d3.zoom()
         .extent([[0, 0], [width, height]])
@@ -160,14 +179,26 @@ MapD3.prototype.UpdateService = function (map) {
 
 MapD3.prototype.Update = function (map, graph) {
     if (graph == null) {
-        map.BaseLayer.selectAll("*").remove();
+        map.LinkLayer.selectAll("*").remove();
         map.NodeLayer.selectAll("*").remove();
         return;
     }
 
+    graph.groups.forEach(x => {
+        var found = false;
+        map.Groups.forEach(y => { if (x.code === y.code) found = true; FillGroup(x, y); });
+        if (!found) map.Groups.push(NewGroupFromGroup(x));
+    });
+
+    map.Groups = map.Groups.filter(function (x) {
+        var found = false;
+        graph.groups.forEach(y => { if (x.code === y.code) found = true; });
+        return found;
+    });
+
     graph.links.forEach(x => {
         var found = false;
-        map.Links.forEach(y => { if (x.code === y.code) found = true; });
+        map.Links.forEach(y => { if (x.code === y.code) found = true; FillLink(x, y); });
         if (!found) map.Links.push(NewLinkFromLink(x));
     });
 
@@ -179,7 +210,7 @@ MapD3.prototype.Update = function (map, graph) {
 
     graph.nodes.forEach(x => {
         var found = false;
-        map.Nodes.forEach(y => { if (x.code === y.code) found = true; });
+        map.Nodes.forEach(y => { if (x.code === y.code) { found = true; FillNode(x, y); } });
         if (!found) map.Nodes.push(NewNodeFromNode(x));
     });
 
@@ -192,12 +223,20 @@ MapD3.prototype.Update = function (map, graph) {
     map.Cola
         .links(map.Links)
         .nodes(map.Nodes)
+        .groups(map.Groups)
         .start();
 
-    var link = map.BaseLayer.selectAll(".d3link")
+    var group = map.LinkLayer.selectAll(".d3group")
+        .data(map.Groups, function (d) { return d.code; })
+        .join("rect")
+        .attr("rx", 5).attr("ry", 5)
+        .attr("class", "d3group")
+        .style("fill", (d) => d.color);
+
+    var link = map.LinkLayer.selectAll(".d3link")
         .data(map.Links, function (d) { return d.code; })
         .join("line")
-        .attr("class", "d3link");
+        .attr("class", "d3link");   
 
     var node = map.NodeLayer.selectAll(".d3node")
         .data(map.Nodes, function (d) { return d.code; })
@@ -253,6 +292,12 @@ MapD3.prototype.Update = function (map, graph) {
         .text(function (d) { return d.footer; });
            
     map.Cola.on("tick", function () {
+        group
+            .attr("x", function (d) { return d.bounds.x -3; })
+            .attr("y", function (d) { return d.bounds.y -3; })
+            .attr("width", function (d) { return d.bounds.width() +6; })
+            .attr("height", function (d) { return d.bounds.height() +6; });
+
         link
             .attr("x1", function (d) { return d.source.x; })
             .attr("y1", function (d) { return d.source.y; })
