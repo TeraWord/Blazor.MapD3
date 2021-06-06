@@ -54,6 +54,7 @@ namespace TeraWord.Blazor.MapD3
                 if (Module is not null) await Module.InvokeVoidAsync("MapD3Init", ID, Width, Height, Instance, Service);
         
                 await Update();
+                await ZoomToCenter(2);
             }   
         }
 
@@ -78,9 +79,20 @@ namespace TeraWord.Blazor.MapD3
             if (Module is not null) await Module.InvokeVoidAsync("MapD3ZoomToFit");
         }
 
+        public async Task ZoomTo(double x, double y, double s)
+        {
+            if (Module is not null) await Module.InvokeVoidAsync("MapD3ZoomTo", x, y, s);
+        }
+
+        public async Task ZoomToCenter(double s)
+        {
+            if (Module is not null) await Module.InvokeVoidAsync("MapD3ZoomToCenter", s);
+        }
+
+
         public async Task Update()
         {
-            if (Module is not null) await Module.InvokeVoidAsync("MapD3Update", Data);
+            if (Module is not null) await Module.InvokeVoidAsync("MapD3Update", Data.Compile());
         }
 
         public void Dispose()

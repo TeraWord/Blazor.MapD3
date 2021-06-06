@@ -39,8 +39,10 @@ namespace TeraWord.Blazor.MapD3
             }
         }
 
-        public Data Compile()
+        internal Data Compile()
         {
+            Links.Clear();
+            
             for (int contChild = 0; contChild < Nodes.Count; contChild++)
             {
                 var child = Nodes[contChild];

@@ -101,7 +101,7 @@ namespace Demo.Pages
                 //};
             }
 
-            Data = data.Compile();
+            Data = data;
         }
 
         private async Task OnNodeClick(Node node)
@@ -113,15 +113,18 @@ namespace Demo.Pages
 
         private void OnRootClick(dynamic e)
         {
-            parent = Guid.NewGuid();
+            var newRoot = Guid.NewGuid();
 
-            var node = Data.NewNode($"{parent}", $"{root}");
+            var node = Data.NewNode($"{newRoot}", $"{root}");
 
-            node.Label = "Parent";
+            root = newRoot;
+            parent = newRoot;
+
+            node.Label = "Root";
             node.Tooltip = node.Label + " - " + "Descrizione";
-            node.Color = 1 switch { 0 => "red", 1 => "green", 2 => "blue", _ => "black" };
+            node.Color = 0 switch { 0 => "red", 1 => "green", 2 => "blue", _ => "black" };
 
-            Data = Data.Compile();
+            Data = Data;
         }
 
         private void OnParentClick(dynamic e)
@@ -136,7 +139,7 @@ namespace Demo.Pages
 
             parent = child;
 
-            Data = Data.Compile();
+            Data = Data;
         }
 
         private void OnChildClick(dynamic e)
@@ -149,13 +152,13 @@ namespace Demo.Pages
             node.Tooltip = node.Label + " - " + "Descrizione";
             node.Color = 2 switch { 0 => "red", 1 => "green", 2 => "blue", _ => "black" };
 
-            Data = Data.Compile();
+            Data = Data;
         }
 
         private void OnLinkClick(dynamic e)
         {
             Data.NewNode($"{child}", $"{root}");
-            Data = Data.Compile();
+            Data = Data;
         }
 
         private void OnLonelyClick(dynamic e)
@@ -168,7 +171,7 @@ namespace Demo.Pages
             node.Tooltip = node.Label + " - " + "Lonely";
             node.Color = 2 switch { 0 => "red", 1 => "green", 2 => "blue", _ => "black" };
 
-            Data = Data.Compile();
+            Data = Data;
         }
 
         private void OnRemoveClick(dynamic e)
@@ -178,8 +181,8 @@ namespace Demo.Pages
             if (node is not null)
             {
                 Data.Nodes.Remove(node);
-                child = Guid.Parse(Data.Nodes.Last().Code);
-                Data = Data.Compile();
+                child = Guid.Parse(Data.Nodes.LastOrDefault()?.Code ?? Guid.Empty.ToString());
+                Data = Data;
             }
         }
 
