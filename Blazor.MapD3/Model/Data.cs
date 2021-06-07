@@ -87,7 +87,7 @@ namespace TeraWord.Blazor.MapD3
             //Groups = (from g in Groups where g.Leaves.Count > 0 select g).ToList();
             Links = (from l in Links orderby l.Target, l.Source select l).ToList();
 
-            System.IO.File.WriteAllText("D:/Tests/Blazor.MapD3/Data.json", System.Text.Json.JsonSerializer.Serialize(this, new() { WriteIndented = true }));
+            //  System.IO.File.WriteAllText("D:/Tests/Blazor.MapD3/Data.json", System.Text.Json.JsonSerializer.Serialize(this, new() { WriteIndented = true }));
 
             return this;
         }
