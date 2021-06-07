@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace TeraWord.Blazor.MapD3
 {
-    public partial class MapD3 : IDisposable
+    public partial class MapD3 : ComponentBase, IDisposable
     {
         [Inject] private IJSRuntime JSRuntime { get; set; }
 
@@ -21,7 +21,8 @@ namespace TeraWord.Blazor.MapD3
 
         [Parameter] public int Height { get; set; }
 
-        [Parameter] public Data Data { get; set; }
+        [Parameter] public Data Data { get => _Data; set { _Data = value; _ = Update(); } }
+        private Data _Data;
 
         [Parameter] public bool ZoomEnabled { get; set; }
 
@@ -34,16 +35,9 @@ namespace TeraWord.Blazor.MapD3
             await OnNodeClick.InvokeAsync(node);
         }
 
-        private DotNetObjectReference<MapD3> MapD3Instance;
+        private DotNetObjectReference<MapD3> Instance;
 
-        private IJSObjectReference MapD3Module;
-
-        protected override void OnInitialized()
-        {
-            base.OnInitialized();
-
-            MapD3Instance = DotNetObjectReference.Create(this);
-        }
+        private IJSObjectReference Module;
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
@@ -51,18 +45,17 @@ namespace TeraWord.Blazor.MapD3
 
             if (firstRender)
             {
-                MapD3Module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./_content/teraword.blazor.mapd3/mapd3.js");
-
-                await MapD3Module.InvokeVoidAsync("MapD3Init", ID, Width, Height, MapD3Instance, Service);
-
-                //await MapD3Module.InvokeVoidAsync("MapD3Load", Data);
-            }
-            else
-            {
-                //await MapD3Module.InvokeVoidAsync("MapD3Update", Data);
-            }
-
-            await MapD3Module.InvokeVoidAsync("MapD3Load", Data);
+                if (Module is null)
+                {
+                    await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./_content/teraword.blazor.mapd3/cola.d3v6.js");
+                    Module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./_content/teraword.blazor.mapd3/mapd3.js");
+                }
+                if (Instance is null) Instance = DotNetObjectReference.Create(this);
+                if (Module is not null) await Module.InvokeVoidAsync("MapD3Init", ID, Width, Height, Instance, Service);
+        
+                await Update();
+                await ZoomToCenter(2);
+            }   
         }
 
         private async void Clicked()
@@ -81,11 +74,34 @@ namespace TeraWord.Blazor.MapD3
             }
         }
 
+        public async Task ZoomToFit()
+        {
+            if (Module is not null) await Module.InvokeVoidAsync("MapD3ZoomToFit");
+        }
+
+        public async Task ZoomTo(double x, double y, double s)
+        {
+            if (Module is not null) await Module.InvokeVoidAsync("MapD3ZoomTo", x, y, s);
+        }
+
+        public async Task ZoomToCenter(double s)
+        {
+            if (Module is not null) await Module.InvokeVoidAsync("MapD3ZoomToCenter", s);
+        }
+
+
+        public async Task Update()
+        {
+            if (Module is not null) await Module.InvokeVoidAsync("MapD3Update", Data.Compile());
+        }
+
         public void Dispose()
         {
-            MapD3Instance?.Dispose();
-
-            MapD3Module?.DisposeAsync();
+            if (Instance is not null) Instance.Dispose();
+            Instance = null;
+            
+            if (Module is not null) Module.DisposeAsync();
+            Module = null;
         }
     }
 }

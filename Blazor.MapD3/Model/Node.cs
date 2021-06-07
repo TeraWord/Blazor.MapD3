@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace TeraWord.Blazor.MapD3
 {
@@ -8,7 +9,7 @@ namespace TeraWord.Blazor.MapD3
 
         public string Label { get; set; }
 
-        public List<string> Parents { get; set; } = new();
+        public List<string> Parents { get; set;  } = new();
 
         public string Group { get; set; }
 

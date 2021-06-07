@@ -14,6 +14,11 @@ namespace Demo.Pages
         private Guid root = new Guid("{646DBB8D-B1D2-43F2-BD9C-4FE3E27BD0BA}");
         private Guid parent;
         private Guid child;
+        private Guid groupA = new Guid("{E58A93B4-0016-479E-AE83-FCE8415B2BE5}");
+
+        private string NodeJson { get; set; }
+
+        private MapD3 MapD3 { get; set; }
 
         protected override async Task OnInitializedAsync()
         {
@@ -59,31 +64,11 @@ namespace Demo.Pages
                 Footer = (string)null
             });
 
-            items.Add(new
-            {
-                Code = Guid.NewGuid(),
-                Label = "Header",
-                Parent = root,
-                Description = "Descrizione",
-                Status = 2,
-                Header = "JJJJJJ",
-                Footer = "gggggg"
-            });
-
-            items.Add(new
-            {
-                Code = Guid.NewGuid(),
-                Label = "Footer",
-                Parent = root,
-                Description = "Descrizione",
-                Status = 2,
-                Header = "gggggg",
-                Footer = "JJJJJJ"
-            });
+            Node node;
 
             foreach (var item in items)
             {
-                var node = data.NewNode(item.Code.ToString(), item.Parent.ToString());
+                node = data.AddNode(item.Code.ToString(), item.Parent.ToString());
                 node.Label = item.Label;
                 node.Tooltip = item.Label + " - " + item.Description;
                 node.Color = item.Status switch { 0 => "red", 1 => "green", 2 => "blue", _ => "black" };
@@ -97,34 +82,47 @@ namespace Demo.Pages
                 //};
             }
 
-            Data = data.Compile();
+            //var group = data.AddGroup($"{groupA}");
+            //group.Color = "#FF5555";
+
+            //node = data.AddNode($"{Guid.NewGuid()}", $"{parent}");
+            //node.Label = "Inside";
+            //node.Group = $"{groupA}";
+            //node.Color = "orange";
+
+            //node = data.AddNode($"{Guid.NewGuid()}", $"{parent}");
+            //node.Label = "Inside";
+            //node.Group = $"{groupA}";
+            //node.Color = "orange";
+
+            Data = data;
         }
 
         private async Task OnNodeClick(Node node)
         {
             var json = JsonSerializer.Serialize(node, new JsonSerializerOptions { WriteIndented = true });
-            Console.WriteLine(json);
+            NodeJson = json;
             await Task.CompletedTask;
         }
 
         private void OnRootClick(dynamic e)
         {
-            parent = Guid.NewGuid();
-
-            var node = Data.NewNode($"{parent}", $"{root}");
-
-            node.Label = "Parent";
+            var node = Data.AddNode($"{root}");
+                        
+            node.Label = "Root";
             node.Tooltip = node.Label + " - " + "Descrizione";
-            node.Color = 1 switch { 0 => "red", 1 => "green", 2 => "blue", _ => "black" };
+            node.Color = 0 switch { 0 => "red", 1 => "green", 2 => "blue", _ => "black" };
 
-            Data = Data.Compile();
+            Data = Data;
         }
 
         private void OnParentClick(dynamic e)
         {
             child = Guid.NewGuid();
 
-            var node = Data.NewNode($"{child}", $"{parent}");
+            parent = Data.ExistsNode(parent.ToString()) ? parent : root;
+
+            var node = Data.AddNode($"{child}", $"{parent}");
 
             node.Label = "Parent";
             node.Tooltip = node.Label + " - " + "Descrizione";
@@ -132,26 +130,77 @@ namespace Demo.Pages
 
             parent = child;
 
-            Data = Data.Compile();
+            Data = Data;
         }
 
         private void OnChildClick(dynamic e)
         {
             child = Guid.NewGuid();
 
-            var node = Data.NewNode($"{child}", $"{parent}");
+            var node = Data.AddNode($"{child}", $"{parent}");
 
             node.Label = "Child";
             node.Tooltip = node.Label + " - " + "Descrizione";
             node.Color = 2 switch { 0 => "red", 1 => "green", 2 => "blue", _ => "black" };
 
-            Data = Data.Compile();
+            Data = Data;
         }
 
         private void OnLinkClick(dynamic e)
         {
-            Data.NewNode($"{child}", $"{root}");
-            Data = Data.Compile();
+            Data.AddLink($"{child}", $"{root}");
+            Data = Data;
+        }
+
+        private void OnLonelyClick(dynamic e)
+        {
+            child = Guid.NewGuid();
+
+            var node = Data.AddNode($"{child}", null);
+
+            node.Label = "Lonely";
+            node.Tooltip = node.Label + " - " + "Lonely";
+            node.Color = 2 switch { 0 => "red", 1 => "green", 2 => "blue", _ => "black" };
+
+            Data = Data;
+        }
+
+        private void OnRemoveClick(dynamic e)
+        {
+            var node = Data.Nodes.FirstOrDefault(x => Guid.Parse(x.Code).Equals(child));
+            
+            if (node is not null)
+            {
+                Data.Nodes.Remove(node);
+                child = Guid.Parse(Data.Nodes.LastOrDefault()?.Code ?? Guid.Empty.ToString());
+                Data = Data;
+            }
+        }
+
+        private async void OnZoomToFitClick(dynamic e)
+        {
+            await MapD3.ZoomToFit();
+        }
+
+        private void OnGroupClick(dynamic e)
+        {
+            groupA = Guid.NewGuid();
+            var group = Data.AddGroup($"{groupA}");
+            group.Color = "#FF5555";
+
+            Data = Data;
+        }
+
+        private void OnInsideClick(dynamic e)
+        {
+            child = Guid.NewGuid();
+
+            var node = Data.AddNode($"{child}", $"{parent}");
+            node.Label = "Inside";
+            node.Group = $"{groupA}";
+            node.Color = "orange";
+
+            Data = Data;
         }
     }
 }
