@@ -323,26 +323,7 @@ MapD3.prototype.OnMouseClick = function (evt, map, node) {
 };
 
 MapD3.prototype.TextWidth = function (map, text, cssClass) {
-    var id = "ERTWERTWERTWERTWERTWE";
-
-    var m = map.Area
-        .append("text")
-        .attr("id", id)
-        .attr("class", cssClass) // "d3label")
-        .style("fill", "transparent");
-
-    //var length = m.text(text).node().getComputedTextLength();
-
-    var box = m.text(text).node().getBBox();
-    var width = box.width;
-
-    d3.select("#ERTWERTWERTWERTWERTWE").remove();
-
-    return width;
-};
-
-MapD3.prototype.TextHeight = function (map, text, cssClass) {
-    var id = "ERTWERTWERTWERTWERTWE";
+    var id = "ERTWERTWERTWERTWERTWEW";
 
     var m = map.NodeLayer
         .append("text")
@@ -350,14 +331,29 @@ MapD3.prototype.TextHeight = function (map, text, cssClass) {
         .attr("class", cssClass) // "d3label")
         .style("fill", "transparent");
 
-    //var length = m.text(text).node().getComputedTextLength();
+    var box = m.text(text).node().getBBox();
+    var width = box.width;
+
+    d3.select("#ERTWERTWERTWERTWERTWEW").remove();
+
+    return width;
+};
+
+MapD3.prototype.TextHeight = function (map, text, cssClass) {
+    var id = "ERTWERTWERTWERTWERTWEhH";
+
+    var m = map.NodeLayer
+        .append("text")
+        .attr("id", id)
+        .attr("class", cssClass) // "d3label")
+        .style("fill", "transparent");
 
     var box = m.text(text).node().getBBox();
     var height = box.height;
 
-    d3.select("#ERTWERTWERTWERTWERTWE").remove();
+    d3.select("#ERTWERTWERTWERTWERTWEH").remove();
 
-    return length;
+    return height;
 };
 
 MapD3.prototype.Bounds = function (map) {
