@@ -5,6 +5,8 @@ namespace TeraWord.Blazor.MapD3
 {
     public sealed class Node
     {
+        public int Index { get; internal set; }
+
         public string Code { get; set; }
 
         public string Label { get; set; }

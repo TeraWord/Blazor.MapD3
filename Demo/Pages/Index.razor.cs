@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -14,11 +15,13 @@ namespace Demo.Pages
         private Guid root = new Guid("{646DBB8D-B1D2-43F2-BD9C-4FE3E27BD0BA}");
         private Guid parent;
         private Guid child;
-        private Guid groupA = new Guid("{E58A93B4-0016-479E-AE83-FCE8415B2BE5}");
+        private Guid groupA = new Guid("{E58A93B4-0016-479E-AE83-FCE8415B2BE5}"); 
 
         private string NodeJson { get; set; }
 
         private MapD3 MapD3 { get; set; }
+
+        private Random rnd = new();
 
         protected override async Task OnInitializedAsync()
         {
@@ -182,11 +185,26 @@ namespace Demo.Pages
             await MapD3.ZoomToFit();
         }
 
+        private string NewColor
+        {
+            get
+            {
+                return $"#{rnd.Next(256).ToString("x2")}{rnd.Next(256).ToString("x2")}{rnd.Next(256).ToString("x2")}";
+            }
+        }
+
         private void OnGroupClick(dynamic e)
         {
             groupA = Guid.NewGuid();
             var group = Data.AddGroup($"{groupA}");
-            group.Color = "#FF5555";
+            group.Color = NewColor;
+
+            child = Guid.NewGuid();
+
+            var node = Data.AddNode($"{child}", $"{parent}");
+            node.Label = "Inside";
+            node.Group = $"{groupA}";
+            node.Color = "orange";
 
             Data = Data;
         }
@@ -198,7 +216,7 @@ namespace Demo.Pages
             var node = Data.AddNode($"{child}", $"{parent}");
             node.Label = "Inside";
             node.Group = $"{groupA}";
-            node.Color = "orange";
+            node.Color = "lime";
 
             Data = Data;
         }

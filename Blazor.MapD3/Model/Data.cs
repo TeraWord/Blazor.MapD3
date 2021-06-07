@@ -7,26 +7,39 @@ namespace TeraWord.Blazor.MapD3
 {
     public class Data
     {
-        public List<Node> Nodes { get; set; } = new List<Node>();
-        public List<Link> Links { get; set; } = new List<Link>();
-        public List<Group> Groups { get; set; } = new List<Group>();
+        public List<Node> Nodes { get; set; } = new();
+        public List<Link> Links { get; set; } = new();
+        public List<Group> Groups { get; set; } = new();
 
         public Data() { }
 
         public Data(IEnumerable<Node> nodes) => Assign(nodes);
 
-        public void Assign(IEnumerable<Node> nodes) 
-        { 
-            foreach (var node in nodes) AddNode(node); 
+        public void Assign(IEnumerable<Node> nodes)
+        {
+            foreach (var node in nodes) AddNode(node);
         }
 
         internal Data Compile()
         {
             Links.Clear();
 
+            int index = 0; // Nodes.Count;
+
+            foreach (var group in Groups)
+            {
+                group.Index = index++;
+                group.Leaves.Clear();
+                group.Groups.Clear();
+            };
+
+            index = 0;
+
             for (int contChild = 0; contChild < Nodes.Count; contChild++)
             {
                 var child = Nodes[contChild];
+
+                child.Index = index++;
 
                 foreach (var parent in child.Parents)
                 {
@@ -48,80 +61,59 @@ namespace TeraWord.Blazor.MapD3
                         }
                     }
                 }
+                                
+                var group = Groups.FirstOrDefault(x => x.Code.Equals(child.Group));
 
-                if (!String.IsNullOrEmpty(child.Group))
+                if (group != null)
                 {
-                    Group group = null;
+                    if (!group.Leaves.Contains(child.Index)) group.Leaves.Add(child.Index);
+                }                 
+            }
 
-                    for (int contGroup = 0; contGroup < Groups.Count; contGroup++)
-                    {
-                        if (Groups[contGroup].Code == child.Group)
-                        {
-                            group = Groups[contGroup];
-                            break;
-                        }
-                    }
+            foreach(var group in Groups)
+            {
+                foreach(var child in group._Groups)
+                {
+                    var childGroup = Groups.FirstOrDefault(x => x.Code.Equals(child));
 
-                    if (group == null)
-                    {
-                        //group = new ColaGroup();
-                        //group.code = groupCode; 
-                        //groups.Add(group);
-                    }
-                    else
-                    {
-                        group.Leaves.Add(contChild);
-                    }
+                    if (childGroup is not null)
+                        if (!group.Groups.Contains(childGroup.Index))
+                            group.Groups.Add(childGroup.Index);
                 }
+
+                group.Groups = group.Groups.OrderBy(x => x).ToList();
             }
 
             //Groups = (from g in Groups where g.Leaves.Count > 0 select g).ToList();
             Links = (from l in Links orderby l.Target, l.Source select l).ToList();
+
+            System.IO.File.WriteAllText("D:/Tests/Blazor.MapD3/Data.json", System.Text.Json.JsonSerializer.Serialize(this, new() { WriteIndented = true }));
 
             return this;
         }
 
         public Group AddGroup(string code, string parent = null)
         {
-            Group group = null;
-            int groupId = 0;
-
-            for (int cont = 0; cont < Groups.Count; cont++)
-            {
-                if (Groups[cont].Code == code)
-                {
-                    group = Groups[cont];
-                    groupId = cont;
-                    break;
-                }
-            }
+            Group group = Groups.FirstOrDefault(x => x.Code.Equals(code));
 
             if (group == null)
             {
                 group = new Group();
                 group.Code = code;
                 Groups.Add(group);
-                groupId = Groups.Count - 1;
             }
 
             if (!String.IsNullOrEmpty(parent))
-            {
-                for (int cont = 0; cont < Groups.Count; cont++)
-                {
-                    if ((cont != groupId) && (Groups[cont].Code == parent))
-                    {
-                        Groups[cont].Groups.Add(groupId);
-                        break;
-                    }
-                }
-            }
+                foreach (var parentGroup in Groups.Where(x => x.Code.Equals(parent)))
+                    if (!parentGroup._Groups.Contains(code))
+                        parentGroup._Groups.Add(code);
 
             return group;
         }
 
         public Node FindNode(string code)
         {
-            return Nodes?.Where(x => x.Code.Equals(code)).FirstOrDefault();
+            return Nodes?.FirstOrDefault(x => x.Code.Equals(code));
         }
 
         public bool ExistsNode(string code)
@@ -139,7 +131,7 @@ namespace TeraWord.Blazor.MapD3
                 node.Code = code;
                 Nodes.Add(node);
             }
-            
+
             return AddLink(node.Code, parent);
         }
 
@@ -168,7 +160,7 @@ namespace TeraWord.Blazor.MapD3
             var node = FindNode(code);
 
             if (node is not null && parents is not null)
-                foreach (var parent in parents) 
+                foreach (var parent in parents)
                     if (!string.IsNullOrWhiteSpace(parent))
                         if (!node.Parents.Contains(parent))
                             node.Parents.Add(parent);

@@ -59,6 +59,7 @@ function MapD3OnInternalNodeClick(e) {
 
 function NewNodeFromNode(e) {
     return {
+        index: e.index,
         code: e.code,
         label: e.label,
         parents: e.parents,
@@ -82,6 +83,7 @@ function NewLinkFromLink(e) {
 
 function NewGroupFromGroup(e) {
     return {
+        index: e.index,
         code: e.code,
         leaves: e.leaves,
         groups: e.groups,
@@ -89,7 +91,8 @@ function NewGroupFromGroup(e) {
     };
 }
 
-function FillGroup(e, group) { 
+function FillGroup(e, group) {
+    group.index = e.index;
     group.leaves = e.leaves;
     group.groups = e.groups;
     group.color = e.color;
@@ -100,6 +103,7 @@ function FillLink(e, link) {
 }
 
 function FillNode(e, node) {
+    node.index = e.index;
     node.label = e.label;
     node.parents = e.parents;
     node.group = e.group;
@@ -113,44 +117,45 @@ function FillNode(e, node) {
 /* -----------------------------------------------------------------------------------------------------------------------------  */
 
 function MapD3(width, height, div, action, onNodeClick) {
-    this.Width = width;
-    this.Height = height;
+    this.Div = div;
     this.IsMouseDown = false;
     this.Action = action;
     this.OnNodeClick = onNodeClick;
 
-    var map = this;
+    this.Width = document.getElementById(div).clientWidth;
+    this.Height = document.getElementById(div).clientHeight;
+
+    //alert("w: " + this.Width + " h:" + this.Height)
 
     this.Cola = cola.d3adaptor(d3)
         .avoidOverlaps(true)
         .handleDisconnected(true)
         .linkDistance(60)
-        .size([width, height]);
+        .size([this.Width, this.Height]);
 
     this.Svg = d3.select('#' + div)
         .append("svg")
         .attr("width", "100%")
-        .attr("height", height)
-        .attr("pointer-eventes", "all")
-        .attr("id", "svg-" + div);
+        .attr("height", "100%")
+        .attr("pointer-eventes", "all");
 
     //this.Svg.append('rect')
     //    .attr('width', "100%")
     //    .attr('height', "100%")
     //    .style('fill', 'white');
 
-    this.Layers = map.Svg.append("g");
+    this.Layers = this.Svg.append("g");
 
-    this.GroupLayer = map.Layers.append("g");
-    this.LinkLayer = map.Layers.append("g");
-    this.NodeLayer = map.Layers.append("g");
+    this.GroupLayer = this.Layers.append("g");
+    this.LinkLayer = this.Layers.append("g");
+    this.NodeLayer = this.Layers.append("g");
 
     this.Links = [];
     this.Nodes = [];
     this.Groups = [];
 
     this.Zoom = d3.zoom()
-        .extent([[0, 0], [width, height]])
+        .extent([[0, 0], [this.Width, this.Height]])
         .scaleExtent([0.1, 10])
         .on("zoom", function (evt) {
             //map.Layers.attr("transform", evt.transform);
@@ -158,7 +163,7 @@ function MapD3(width, height, div, action, onNodeClick) {
 
         });
 
-    this.Svg.call(map.Zoom);
+    this.Svg.call(this.Zoom);
 }
 
 MapD3.prototype.UpdateService = function (map) {
@@ -166,19 +171,24 @@ MapD3.prototype.UpdateService = function (map) {
     $.getJSON(map.Action, function (graph) {
         Update(map, graph);
     })
-        .done(function () {
-            console.log("second success");
-        })
-        .fail(function () {
-            console.log("error");
-        })
-        .always(function () {
-            console.log("complete");
-        });
+    .done(function () {
+        console.log("second success");
+    })
+    .fail(function () {
+        console.log("error");
+    })
+    .always(function () {
+        console.log("complete");
+    });
 };
 
 MapD3.prototype.Update = function (map, graph) {
+
+    this.Width = document.getElementById(this.Div).clientWidth;
+    this.Height = document.getElementById(this.Div).clientHeight;
+    
     if (graph == null) {
+        map.GroupLayer.selectAll("*").remove();
         map.LinkLayer.selectAll("*").remove();
         map.NodeLayer.selectAll("*").remove();
         return;
@@ -221,25 +231,25 @@ MapD3.prototype.Update = function (map, graph) {
     });
 
     map.Cola
+        .groups(map.Groups)
         .links(map.Links)
         .nodes(map.Nodes)
-        .groups(map.Groups)
         .start();
 
-    var group = map.LinkLayer.selectAll(".d3group")
-        .data(map.Groups, function (d) { return d.code; })
+    var group = map.GroupLayer.selectAll(".d3group")
+        .data(map.Groups, d => d.code)
         .join("rect")
         .attr("rx", 5).attr("ry", 5)
         .attr("class", "d3group")
-        .style("fill", (d) => d.color);
+        .style("fill", d => d.color);
 
     var link = map.LinkLayer.selectAll(".d3link")
-        .data(map.Links, function (d) { return d.code; })
+        .data(map.Links, d => d.code)
         .join("line")
         .attr("class", "d3link");   
 
     var node = map.NodeLayer.selectAll(".d3node")
-        .data(map.Nodes, function (d) { return d.code; })
+        .data(map.Nodes, d => d.code)
         .join("g")
         .attr("class", "d3node")
         .on("touchmove", function () { d3.event.preventDefault() })
@@ -262,50 +272,48 @@ MapD3.prototype.Update = function (map, graph) {
             return d.height;
         })
         .attr("rx", 5).attr("ry", 5)
-        .style("fill", function (d) {
-            return d.color;
-        })
+        .style("fill", d => d.color)
         .on("click", function (evt, node) {
             map.OnMouseClick(evt, map, node);
         });
 
     node
         .append("title").attr("class", "d3tooltip")
-        .text(function (d) { return d.tooltip; });
+        .text(d => d.tooltip);
 
     node
         .append("text").attr("class", "d3label")
-        .attr("x", function (d) { return d.width / 2; })
-        .attr("y", function (d) { return d.height / 2 + 2; })
-        .text(function (d) { return d.label; });
+        .attr("x", d => d.width / 2)
+        .attr("y", d => d.height / 2 + 2)
+        .text(d => d.label);
 
     node.filter(function (d) { return d.header !== null; })
         .append("text").attr("class", "d3labelHeader")
-        .attr("x", function (d) { return d.width / 2; })
-        .attr("y", function (d) { return d.height / 2 -8; })
-        .text(function (d) { return d.header; });
+        .attr("x", d => d.width / 2)
+        .attr("y", d => d.height / 2 -8)
+        .text(d => d.header);
 
     node.filter(function (d) { return d.footer !== null; })
         .append("text").attr("class", "d3labelFooter")
-        .attr("x", function (d) { return d.width / 2; })
-        .attr("y", function (d) { return d.height / 2 + 12; })
-        .text(function (d) { return d.footer; });
+        .attr("x", d => d.width / 2)
+        .attr("y", d => d.height / 2 + 12)
+        .text(d => d.footer);
            
     map.Cola.on("tick", function () {
         group
-            .attr("x", function (d) { return d.bounds.x -3; })
-            .attr("y", function (d) { return d.bounds.y -3; })
-            .attr("width", function (d) { return d.bounds.width() +6; })
-            .attr("height", function (d) { return d.bounds.height() +6; });
+            .attr("x", d => d.bounds.x -3)
+            .attr("y", d => d.bounds.y -3)
+            .attr("width", d => d.bounds.width() +6)
+            .attr("height", d => d.bounds.height() +6);
 
         link
-            .attr("x1", function (d) { return d.source.x; })
-            .attr("y1", function (d) { return d.source.y; })
-            .attr("x2", function (d) { return d.target.x; })
-            .attr("y2", function (d) { return d.target.y; });
+            .attr("x1", d => d.source.x)
+            .attr("y1", d => d.source.y)
+            .attr("x2", d => d.target.x)
+            .attr("y2", d => d.target.y);
 
         node
-            .attr("transform", function (d) { return "translate(" + (d.x - d.width / 2) + "," + (d.y - d.height / 2) + ")"; });
+            .attr("transform", d =>  "translate(" + (d.x - d.width / 2) + "," + (d.y - d.height / 2) + ")");
     });
 };
 

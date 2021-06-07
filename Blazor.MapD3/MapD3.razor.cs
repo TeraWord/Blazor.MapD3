@@ -17,9 +17,9 @@ namespace TeraWord.Blazor.MapD3
 
         [Parameter] public string Style { get; set; }
 
-        [Parameter] public int Width { get; set; }
+        [Parameter] public string Width { get; set; } = "100%";
 
-        [Parameter] public int Height { get; set; }
+        [Parameter] public string Height { get; set; } = "500px";
 
         [Parameter] public Data Data { get => _Data; set { _Data = value; _ = Update(); } }
         private Data _Data;
@@ -54,13 +54,13 @@ namespace TeraWord.Blazor.MapD3
                 if (Module is not null) await Module.InvokeVoidAsync("MapD3Init", ID, Width, Height, Instance, Service);
         
                 await Update();
-                await ZoomToCenter(2);
+                await ZoomToCenter(1.5);
             }   
         }
 
         private async void Clicked()
         {
-            await JSRuntime.InvokeVoidAsync("MapD3Refresh");
+            if (Module is not null) await Module.InvokeVoidAsync("MapD3Refresh");
         }
 
         private string InternalStyle
@@ -69,6 +69,8 @@ namespace TeraWord.Blazor.MapD3
             {
                 var style = new StringBuilder();
                 style.Append("position:relative;");
+                style.Append("width:100%;");
+                style.Append("height:100%;");
                 style.Append(Style);
                 return style.ToString();
             }
