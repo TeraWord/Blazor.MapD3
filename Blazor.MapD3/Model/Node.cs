@@ -17,6 +17,8 @@ namespace TeraWord.Blazor.MapD3
 
         public string Tooltip { get; set; }
 
+        public string Icon { get; set; }
+
         public string Color { get; set; }
 
         public string Header { get; set; }

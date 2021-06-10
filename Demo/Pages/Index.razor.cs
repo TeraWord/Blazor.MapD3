@@ -115,6 +115,7 @@ namespace Demo.Pages
             node.Label = "Root";
             node.Tooltip = node.Label + " - " + "Descrizione";
             node.Color = 0 switch { 0 => "red", 1 => "green", 2 => "blue", _ => "black" };
+            node.Icon = "archive";
 
             Data = Data;
         }
@@ -130,6 +131,7 @@ namespace Demo.Pages
             node.Label = "Parent";
             node.Tooltip = node.Label + " - " + "Descrizione";
             node.Color = 1 switch { 0 => "red", 1 => "green", 2 => "blue", _ => "black" };
+            node.Icon = "handshake";
 
             parent = child;
 
@@ -142,9 +144,10 @@ namespace Demo.Pages
 
             var node = Data.AddNode($"{child}", $"{parent}");
 
-            node.Label = "Child";
+            //node.Label = "Child";
             node.Tooltip = node.Label + " - " + "Descrizione";
             node.Color = 2 switch { 0 => "red", 1 => "green", 2 => "blue", _ => "black" };
+            node.Icon = "child";
 
             Data = Data;
         }

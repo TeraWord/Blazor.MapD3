@@ -64,3 +64,11 @@
     cursor: pointer;
     pointer-events: none;
 }
+
+.d3awesome {
+    fill: #006;
+    color: white;
+    background-color: transparent;
+    font-size: 8px;
+    font-weight: bold;
+}

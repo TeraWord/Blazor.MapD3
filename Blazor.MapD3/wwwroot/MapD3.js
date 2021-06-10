@@ -12,7 +12,7 @@ function MapD3UpdateService() {
 }
 
 export function MapD3Update(data) {
-    _MapD3.Update(_MapD3, data);
+    _MapD3.Update(data);
 }
 
 export function MapD3ZoomToFit() {
@@ -62,6 +62,7 @@ function NewNodeFromNode(e) {
         index: e.index,
         code: e.code,
         label: e.label,
+        icon: e.icon,
         parents: e.parents,
         group: e.group,
         tooltip: e.tooltip,
@@ -105,6 +106,7 @@ function FillLink(e, link) {
 function FillNode(e, node) {
     node.index = e.index;
     node.label = e.label;
+    node.icon = e.icon;
     node.parents = e.parents;
     node.group = e.group;
     node.tooltip = e.tooltip;
@@ -166,10 +168,44 @@ function MapD3(width, height, div, action, onNodeClick) {
     this.Svg.call(this.Zoom);
 }
 
-MapD3.prototype.UpdateService = function (map) {
+MapD3.prototype.TextWidth = function (text, cssClass) {
+    var id = "ERTWERTWERTWERTWERTWEW";
+
+    var m = this.NodeLayer
+        .append("text")
+        .attr("id", id)
+        .attr("class", cssClass) // "d3label")
+        .style("fill", "transparent");
+
+    var box = m.text(text).node().getBBox();
+    var width = box.width;
+
+    d3.select("#ERTWERTWERTWERTWERTWEW").remove();
+
+    return width;
+};
+
+MapD3.prototype.TextHeight = function (text, cssClass) {
+    var id = "ERTWERTWERTWERTWERTWEhH";
+
+    var m = this.NodeLayer
+        .append("text")
+        .attr("id", id)
+        .attr("class", cssClass) // "d3label")
+        .style("fill", "transparent");
+
+    var box = m.text(text).node().getBBox();
+    var height = box.height;
+
+    d3.select("#ERTWERTWERTWERTWERTWEH").remove();
+
+    return height;
+};
+
+MapD3.prototype.UpdateService = function () {
     //d3.json(map.Action, function (error, graph) {
-    $.getJSON(map.Action, function (graph) {
-        Update(map, graph);
+    $.getJSON(this.Action, function (graph) {
+        Update(graph);
     })
     .done(function () {
         console.log("second success");
@@ -182,99 +218,133 @@ MapD3.prototype.UpdateService = function (map) {
     });
 };
 
-MapD3.prototype.Update = function (map, graph) {
-
-    this.Width = document.getElementById(this.Div).clientWidth;
-    this.Height = document.getElementById(this.Div).clientHeight;
-    
-    if (graph == null) {
-        map.GroupLayer.selectAll("*").remove();
-        map.LinkLayer.selectAll("*").remove();
-        map.NodeLayer.selectAll("*").remove();
+MapD3.prototype.SyncGraph = function (graph) {
+    if (graph === null) {
+        this.GroupLayer.selectAll("*").remove();
+        this.LinkLayer.selectAll("*").remove();
+        this.NodeLayer.selectAll("*").remove();
         return;
     }
 
-    graph.groups.forEach(x => {
-        var found = false;
-        map.Groups.forEach(y => { if (x.code === y.code) found = true; FillGroup(x, y); });
-        if (!found) map.Groups.push(NewGroupFromGroup(x));
-    });
+    if (graph.groups != null) {
+        graph.groups.forEach(x => {
+            var found = false;
+            this.Groups.forEach(y => { if (x.code === y.code) found = true; FillGroup(x, y); });
+            if (!found) this.Groups.push(NewGroupFromGroup(x));
+        });
 
-    map.Groups = map.Groups.filter(function (x) {
-        var found = false;
-        graph.groups.forEach(y => { if (x.code === y.code) found = true; });
-        return found;
-    });
+        this.Groups = this.Groups.filter(function (x) {
+            var found = false;
+            graph.groups.forEach(y => { if (x.code === y.code) found = true; });
+            return found;
+        });
+    }
+    else
+    {
+        this.Groups = [];
+    }
 
-    graph.links.forEach(x => {
-        var found = false;
-        map.Links.forEach(y => { if (x.code === y.code) found = true; FillLink(x, y); });
-        if (!found) map.Links.push(NewLinkFromLink(x));
-    });
+    if (graph.links != null) {
+        graph.links.forEach(x => {
+            var found = false;
+            this.Links.forEach(y => { if (x.code === y.code) found = true; FillLink(x, y); });
+            if (!found) this.Links.push(NewLinkFromLink(x));
+        });
 
-    map.Links = map.Links.filter(function(x) {
-        var found = false;
-        graph.links.forEach(y => { if (x.code === y.code) found = true; });
-        return found;
-    });
+        this.Links = this.Links.filter(function (x) {
+            var found = false;
+            graph.links.forEach(y => { if (x.code === y.code) found = true; });
+            return found;
+        });
+    }
+    else {
+        this.Links = [];
+    }
 
-    graph.nodes.forEach(x => {
-        var found = false;
-        map.Nodes.forEach(y => { if (x.code === y.code) { found = true; FillNode(x, y); } });
-        if (!found) map.Nodes.push(NewNodeFromNode(x));
-    });
+    if (graph.nodes != null) {
+        graph.nodes.forEach(x => {
+            var found = false;
+            this.Nodes.forEach(y => { if (x.code === y.code) { found = true; FillNode(x, y); } });
+            if (!found) this.Nodes.push(NewNodeFromNode(x));
+        });
 
-    map.Nodes = map.Nodes.filter(function (x) {
-        var found = false;
-        graph.nodes.forEach(y => { if (x.code === y.code) found = true; });
-        return found;
-    });
+        this.Nodes = this.Nodes.filter(function (x) {
+            var found = false;
+            graph.nodes.forEach(y => { if (x.code === y.code) found = true; });
+            return found;
+        });
+    }
+    else {
+        this.Nodes = [];
+    }
+}
 
-    map.Cola
-        .groups(map.Groups)
-        .links(map.Links)
-        .nodes(map.Nodes)
+MapD3.prototype.Update = function (graph) {
+    this.SyncGraph(graph);
+
+    if (graph === null) return;
+
+    this.Width = document.getElementById(this.Div).clientWidth;
+    this.Height = document.getElementById(this.Div).clientHeight;
+
+    this.Cola
+        .groups(this.Groups)
+        .links(this.Links)
+        .nodes(this.Nodes)
         .start();
 
-    var group = map.GroupLayer.selectAll(".d3group")
-        .data(map.Groups, d => d.code)
+    this.GroupLayer.selectAll(".d3group").data(this.Groups, d => d.code).remove();
+
+    var group = this.GroupLayer.selectAll(".d3group")
+        .data(this.Groups, d => d.code)
         .join("rect")
         .attr("rx", 5).attr("ry", 5)
         .attr("class", "d3group")
         .style("fill", d => d.color);
 
-    var link = map.LinkLayer.selectAll(".d3link")
-        .data(map.Links, d => d.code)
+    this.LinkLayer.selectAll(".d3link").data(this.Links, d => d.code).remove();
+
+    var link = this.LinkLayer.selectAll(".d3link")
+        .data(this.Links, d => d.code)
         .join("line")
         .attr("class", "d3link");   
 
-    var node = map.NodeLayer.selectAll(".d3node")
-        .data(map.Nodes, d => d.code)
+    var parent = this;
+
+    this.NodeLayer.selectAll(".d3node").data(this.Nodes, d => d.code).remove();
+
+    var node = this.NodeLayer.selectAll(".d3node")
+        .data(this.Nodes, d => d.code)
         .join("g")
         .attr("class", "d3node")
         .on("touchmove", function () { d3.event.preventDefault() })
         .on("mouseenter", function (evt, node) {
-            map.OnMouseOver(evt, map, node);
+            parent.OnMouseOver(evt, node);
         })
         .on("mouseleave", function (evt, node) {
-            map.OnMouseOut(evt, map, node);
+            parent.OnMouseOut(evt, node);
         }) 
-        .call(map.Cola.drag);
+        .call(this.Cola.drag);
 
     node
         .append("rect")
         .attr("width", function (d) {
-            d.width = map.TextWidth(map, d.label, "d3label") + 10;
+            d.width = 2;
+            if (d.label != null) d.width += parent.TextWidth(d.label, "d3label") + 5;
+            if (d.icon != null) d.offset = 5; else d.offset = 0;
+            d.width += d.offset * 2;
             return d.width;
         })
         .attr("height", function (d) {
-            d.height = map.TextHeight(map, d.label, "d3label") + 4;
+            d.height = 0;
+            if (d.label != null) d.height += parent.TextHeight(d.label, "d3label") + 4;
+            if (d.height === 0) d.height = 12;
             return d.height;
         })
         .attr("rx", 5).attr("ry", 5)
         .style("fill", d => d.color)
         .on("click", function (evt, node) {
-            map.OnMouseClick(evt, map, node);
+            parent.OnMouseClick(evt, node);
         });
 
     node
@@ -283,9 +353,17 @@ MapD3.prototype.Update = function (map, graph) {
 
     node
         .append("text").attr("class", "d3label")
-        .attr("x", d => d.width / 2)
+        .attr("x", d => d.offset + d.width / 2)
         .attr("y", d => d.height / 2 + 2)
         .text(d => d.label);
+
+    node.filter(function (d) { return d.icon !== null; })
+        .append('svg:foreignObject')
+        .attr("width", 100)
+        .attr("height", 100)
+        .attr("x", 3).attr("y", 1)
+        .append("xhtml:body").attr("class", "d3awesome")
+        .html(d => '<i class="fa fa-' + d.icon + '"></i>');
 
     node.filter(function (d) { return d.header !== null; })
         .append("text").attr("class", "d3labelHeader")
@@ -293,13 +371,13 @@ MapD3.prototype.Update = function (map, graph) {
         .attr("y", d => d.height / 2 -8)
         .text(d => d.header);
 
-    node.filter(function (d) { return d.footer !== null; })
+    node.filter(function (d) { return d.footer != null; })
         .append("text").attr("class", "d3labelFooter")
         .attr("x", d => d.width / 2)
         .attr("y", d => d.height / 2 + 12)
         .text(d => d.footer);
            
-    map.Cola.on("tick", function () {
+    this.Cola.on("tick", function () {
         group
             .attr("x", d => d.bounds.x -3)
             .attr("y", d => d.bounds.y -3)
@@ -317,61 +395,28 @@ MapD3.prototype.Update = function (map, graph) {
     });
 };
 
-MapD3.prototype.OnMouseOver = function (evt, map, node) {
+MapD3.prototype.OnMouseOver = function (evt, node) {
     if (node === null) return;
 };
 
-MapD3.prototype.OnMouseOut = function (evt, map, node) {
+MapD3.prototype.OnMouseOut = function (evt, node) {
     if (node === null) return;
 };
 
-MapD3.prototype.OnMouseClick = function (evt, map, node) {
+MapD3.prototype.OnMouseClick = function (evt, node) {
     if (node === null) return;
-    map.OnNodeClick(node);
+    this.OnNodeClick(node);
 };
 
-MapD3.prototype.TextWidth = function (map, text, cssClass) {
-    var id = "ERTWERTWERTWERTWERTWEW";
-
-    var m = map.NodeLayer
-        .append("text")
-        .attr("id", id)
-        .attr("class", cssClass) // "d3label")
-        .style("fill", "transparent");
-
-    var box = m.text(text).node().getBBox();
-    var width = box.width;
-
-    d3.select("#ERTWERTWERTWERTWERTWEW").remove();
-
-    return width;
-};
-
-MapD3.prototype.TextHeight = function (map, text, cssClass) {
-    var id = "ERTWERTWERTWERTWERTWEhH";
-
-    var m = map.NodeLayer
-        .append("text")
-        .attr("id", id)
-        .attr("class", cssClass) // "d3label")
-        .style("fill", "transparent");
-
-    var box = m.text(text).node().getBBox();
-    var height = box.height;
-
-    d3.select("#ERTWERTWERTWERTWERTWEH").remove();
-
-    return height;
-};
-
-MapD3.prototype.Bounds = function (map) {
+MapD3.prototype.Bounds = function () {
     var x = Number.POSITIVE_INFINITY, X = Number.NEGATIVE_INFINITY, y = Number.POSITIVE_INFINITY, Y = Number.NEGATIVE_INFINITY;
 
-    map.NodeLayer.selectAll(".d3node").each(function (v) {
+    this.NodeLayer.selectAll(".d3node").each(function (v) {
         x = Math.min(x, v.x - v.width / 2);
         X = Math.max(X, v.x + v.width / 2);
         y = Math.min(y, v.y - v.height / 2);
         Y = Math.max(Y, v.y + v.height / 2);
     });
+
     return { x: x, X: X, y: y, Y: Y };
 }
