@@ -26,5 +26,17 @@ namespace TeraWord.Blazor.MapD3
         public string Footer { get; set; }
 
         public dynamic Data { get; set; }
+
+        public double Width { get; set; } = 12;
+
+        public double Height { get; set; } = 12;
+
+        public double RoundX { get; set; } = 5;
+
+        public double RoundY { get; set; } = 5; 
+
+        public double IconX { get; set; } = 3;
+
+        public double IconY { get; set; } = 0.75;
     }
 }

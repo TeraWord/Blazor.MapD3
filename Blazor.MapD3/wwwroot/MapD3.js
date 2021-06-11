@@ -17,8 +17,8 @@ export function MapD3Update(data) {
 
 export function MapD3ZoomToFit() {
     var b = _MapD3.Bounds(_MapD3);
-    var w = b.X - b.x; 
-    var h = b.Y - b.y; 
+    var w = b.X - b.x;
+    var h = b.Y - b.y;
     var dw = _MapD3.Width * 0.2;
     var dh = _MapD3.Height * 0.15;
     var cw = Number(_MapD3.Width - dw);
@@ -52,12 +52,31 @@ export function MapD3ZoomTo(x, y, s) {
 }
 
 function MapD3OnInternalNodeClick(e) {
-    var node = NewNodeFromNode(e);
+    var node = Object.assign({}, e);
 
     _MapD3Instance.invokeMethodAsync('OnInternalNodeClick', node);
 }
 
-function NewNodeFromNode(e) {
+function NewGroup(e) {
+    return {
+        index: e.index,
+        code: e.code,
+        leaves: e.leaves,
+        groups: e.groups,
+        color: e.color
+    };
+}
+
+function NewLink(e) {
+    return {
+        code: e.code,
+        source: e.source,
+        target: e.target,
+        selected: e.selected
+    };
+}
+
+function NewNode(e) {
     return {
         index: e.index,
         code: e.code,
@@ -69,41 +88,28 @@ function NewNodeFromNode(e) {
         color: e.color,
         header: e.header,
         footer: e.footer,
-        data: e.data
-    };    
-}
-
-function NewLinkFromLink(e) {
-    return {
-        code: e.code,
-        source: e.source,
-        target: e.target,
-        selected: e.selected
+        data: e.data,
+        width: e.width,
+        height: e.height,
+        roundX: e.roundX,
+        roundY: e.roundY,
+        iconX: e.iconX,
+        iconY: e.iconY,
     };
 }
 
-function NewGroupFromGroup(e) {
-    return {
-        index: e.index,
-        code: e.code,
-        leaves: e.leaves,
-        groups: e.groups,
-        color: e.color
-    };
-}
-
-function FillGroup(e, group) {
+function MergeGroup(e, group) {
     group.index = e.index;
     group.leaves = e.leaves;
     group.groups = e.groups;
     group.color = e.color;
 }
 
-function FillLink(e, link) {
+function MergeLink(e, link) {
     link.selected = e.selected;
 }
 
-function FillNode(e, node) {
+function MergeNode(e, node) {
     node.index = e.index;
     node.label = e.label;
     node.icon = e.icon;
@@ -114,6 +120,12 @@ function FillNode(e, node) {
     node.header = e.header;
     node.footer = e.footer;
     node.data = e.data;
+    node.width = e.width;
+    node.height = e.height;
+    node.roundX = e.roundX;
+    node.roundY = e.roundY;
+    node.iconX = e.iconX;
+    node.iconY = e.iconY;
 }
 
 /* -----------------------------------------------------------------------------------------------------------------------------  */
@@ -207,15 +219,15 @@ MapD3.prototype.UpdateService = function () {
     $.getJSON(this.Action, function (graph) {
         Update(graph);
     })
-    .done(function () {
-        console.log("second success");
-    })
-    .fail(function () {
-        console.log("error");
-    })
-    .always(function () {
-        console.log("complete");
-    });
+        .done(function () {
+            console.log("second success");
+        })
+        .fail(function () {
+            console.log("error");
+        })
+        .always(function () {
+            console.log("complete");
+        });
 };
 
 MapD3.prototype.SyncGraph = function (graph) {
@@ -229,8 +241,8 @@ MapD3.prototype.SyncGraph = function (graph) {
     if (graph.groups != null) {
         graph.groups.forEach(x => {
             var found = false;
-            this.Groups.forEach(y => { if (x.code === y.code) found = true; FillGroup(x, y); });
-            if (!found) this.Groups.push(NewGroupFromGroup(x));
+            this.Groups.forEach(y => { if (x.code === y.code) found = true; MergeGroup(x, y); });
+            if (!found) this.Groups.push(NewGroup(x));
         });
 
         this.Groups = this.Groups.filter(function (x) {
@@ -239,16 +251,15 @@ MapD3.prototype.SyncGraph = function (graph) {
             return found;
         });
     }
-    else
-    {
+    else {
         this.Groups = [];
     }
 
     if (graph.links != null) {
         graph.links.forEach(x => {
             var found = false;
-            this.Links.forEach(y => { if (x.code === y.code) found = true; FillLink(x, y); });
-            if (!found) this.Links.push(NewLinkFromLink(x));
+            this.Links.forEach(y => { if (x.code === y.code) found = true; MergeLink(x, y); });
+            if (!found) this.Links.push(NewLink(x));
         });
 
         this.Links = this.Links.filter(function (x) {
@@ -264,8 +275,8 @@ MapD3.prototype.SyncGraph = function (graph) {
     if (graph.nodes != null) {
         graph.nodes.forEach(x => {
             var found = false;
-            this.Nodes.forEach(y => { if (x.code === y.code) { found = true; FillNode(x, y); } });
-            if (!found) this.Nodes.push(NewNodeFromNode(x));
+            this.Nodes.forEach(y => { if (x.code === y.code) { found = true; MergeNode(x, y); } });
+            if (!found) this.Nodes.push(NewNode(x));
         });
 
         this.Nodes = this.Nodes.filter(function (x) {
@@ -307,7 +318,7 @@ MapD3.prototype.Update = function (graph) {
     var link = this.LinkLayer.selectAll(".d3link")
         .data(this.Links, d => d.code)
         .join("line")
-        .attr("class", "d3link");   
+        .attr("class", "d3link");
 
     var parent = this;
 
@@ -319,33 +330,32 @@ MapD3.prototype.Update = function (graph) {
         .attr("class", "d3node")
         .on("touchmove", function () { d3.event.preventDefault() })
         .on("mouseenter", function (evt, node) {
-            parent.OnMouseOver(evt, node);
+            parent.OnMouseOver(evt, NewNode(node));
         })
         .on("mouseleave", function (evt, node) {
-            parent.OnMouseOut(evt, node);
-        }) 
+            parent.OnMouseOut(evt, NewNode(node));
+        })
+        .on("click", function (evt, node) {
+            parent.OnMouseClick(evt, NewNode(node));
+        })
         .call(this.Cola.drag);
 
     node
         .append("rect")
         .attr("width", function (d) {
-            d.width = 2;
-            if (d.label != null) d.width += parent.TextWidth(d.label, "d3label") + 5;
-            if (d.icon != null) d.offset = 5; else d.offset = 0;
-            d.width += d.offset * 2;
+            d.offset = 0;
+            if (d.icon != null) d.offset += 4;
+            if (d.label != null) d.width += parent.TextWidth(d.label, "d3label");
+            if (d.label != null && d.icon != null) d.width += d.offset + 4;
             return d.width;
         })
         .attr("height", function (d) {
-            d.height = 0;
-            if (d.label != null) d.height += parent.TextHeight(d.label, "d3label") + 4;
-            if (d.height === 0) d.height = 12;
+            //if (d.label != null) d.height += parent.TextHeight(d.label, "d3label") + 4;
+            if (d.height < 12) d.height = 12;
             return d.height;
         })
-        .attr("rx", 5).attr("ry", 5)
-        .style("fill", d => d.color)
-        .on("click", function (evt, node) {
-            parent.OnMouseClick(evt, node);
-        });
+        .attr("rx", d => d.roundX).attr("ry", d => d.roundY)
+        .style("fill", d => d.color);
 
     node
         .append("title").attr("class", "d3tooltip")
@@ -359,16 +369,16 @@ MapD3.prototype.Update = function (graph) {
 
     node.filter(function (d) { return d.icon !== null; })
         .append('svg:foreignObject')
-        .attr("width", 100)
-        .attr("height", 100)
-        .attr("x", 3).attr("y", 1)
+        .attr("width", 32)
+        .attr("height", 32)
+        .attr("x", d => d.iconX).attr("y", d => d.iconY)
         .append("xhtml:body").attr("class", "d3awesome")
         .html(d => '<i class="fa fa-' + d.icon + '"></i>');
 
     node.filter(function (d) { return d.header !== null; })
         .append("text").attr("class", "d3labelHeader")
         .attr("x", d => d.width / 2)
-        .attr("y", d => d.height / 2 -8)
+        .attr("y", d => d.height / 2 - 8)
         .text(d => d.header);
 
     node.filter(function (d) { return d.footer != null; })
@@ -376,13 +386,13 @@ MapD3.prototype.Update = function (graph) {
         .attr("x", d => d.width / 2)
         .attr("y", d => d.height / 2 + 12)
         .text(d => d.footer);
-           
+
     this.Cola.on("tick", function () {
         group
-            .attr("x", d => d.bounds.x -3)
-            .attr("y", d => d.bounds.y -3)
-            .attr("width", d => d.bounds.width() +6)
-            .attr("height", d => d.bounds.height() +6);
+            .attr("x", d => d.bounds.x - 3)
+            .attr("y", d => d.bounds.y - 3)
+            .attr("width", d => d.bounds.width() + 6)
+            .attr("height", d => d.bounds.height() + 6);
 
         link
             .attr("x1", d => d.source.x)
@@ -391,7 +401,7 @@ MapD3.prototype.Update = function (graph) {
             .attr("y2", d => d.target.y);
 
         node
-            .attr("transform", d =>  "translate(" + (d.x - d.width / 2) + "," + (d.y - d.height / 2) + ")");
+            .attr("transform", d => "translate(" + (d.x - d.width / 2) + "," + (d.y - d.height / 2) + ")");
     });
 };
 

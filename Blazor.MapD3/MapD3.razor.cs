@@ -91,7 +91,6 @@ namespace TeraWord.Blazor.MapD3
             if (Module is not null) await Module.InvokeVoidAsync("MapD3ZoomToCenter", s);
         }
 
-
         public async Task Update()
         {
             if (Module is not null) await Module.InvokeVoidAsync("MapD3Update", Data?.Compile());

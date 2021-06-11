@@ -15,7 +15,7 @@ namespace Demo.Pages
         private Guid root = new Guid("{646DBB8D-B1D2-43F2-BD9C-4FE3E27BD0BA}");
         private Guid parent;
         private Guid child;
-        private Guid groupA = new Guid("{E58A93B4-0016-479E-AE83-FCE8415B2BE5}"); 
+        private Guid groupA = new Guid("{E58A93B4-0016-479E-AE83-FCE8415B2BE5}");
 
         private string NodeJson { get; set; }
 
@@ -26,7 +26,7 @@ namespace Demo.Pages
         protected override async Task OnInitializedAsync()
         {
             await base.OnInitializedAsync();
-                        
+
             var data = new TeraWord.Blazor.MapD3.Data();
 
             var items = (new[] {
@@ -111,7 +111,7 @@ namespace Demo.Pages
         private void OnRootClick(dynamic e)
         {
             var node = Data.AddNode($"{root}");
-                        
+
             node.Label = "Root";
             node.Tooltip = node.Label + " - " + "Descrizione";
             node.Color = 0 switch { 0 => "red", 1 => "green", 2 => "blue", _ => "black" };
@@ -138,17 +138,33 @@ namespace Demo.Pages
             Data = Data;
         }
 
+        private string RndIcon
+        {
+            get
+            {
+                var icons = new string[] { "coffee", "cog", "cogs", "comment",  "comments", "copyright", "credit-card", "crop", "crosshairs", "cube", "cubes", "database", "deaf", "desktop" };
+
+                return icons[rnd.Next(icons.Length)];
+            }
+        }
+
         private void OnChildClick(dynamic e)
         {
             child = Guid.NewGuid();
 
             var node = Data.AddNode($"{child}", $"{parent}");
+            var icon = RndIcon;
 
             //node.Label = "Child";
-            node.Tooltip = node.Label + " - " + "Descrizione";
+            node.Tooltip = $"Icon: {icon}";
             node.Color = 2 switch { 0 => "red", 1 => "green", 2 => "blue", _ => "black" };
-            node.Icon = "child";
-
+            node.Icon = RndIcon;
+            node.Width = 16;
+            node.Height = 16;
+            node.RoundX = 16;
+            node.RoundY = 16;
+            node.IconX = 4;
+            node.IconY = 2;
             Data = Data;
         }
 
