@@ -177,7 +177,7 @@ function MapD3(width, height, div, action, onNodeClick) {
 
         });
 
-    this.Svg.call(this.Zoom);
+    //this.Svg.call(this.Zoom);
 }
 
 MapD3.prototype.TextWidth = function (text, cssClass) {
