@@ -172,12 +172,12 @@ function MapD3(width, height, div, action, onNodeClick) {
         .extent([[0, 0], [this.Width, this.Height]])
         .scaleExtent([0.1, 10])
         .on("zoom", function (evt) {
-            //map.Layers.attr("transform", evt.transform);
-            _MapD3.Layers.attr("transform", "translate(" + evt.transform.x + "," + evt.transform.y + ") scale(" + evt.transform.k + ")");
+            _MapD3.Layers.attr("transform", evt.transform);
+            //_MapD3.Layers.attr("transform", "translate(" + evt.transform.x + "," + evt.transform.y + ") scale(" + evt.transform.k + ")");
 
         });
 
-    //this.Svg.call(this.Zoom);
+    this.Svg.call(this.Zoom);
 }
 
 MapD3.prototype.TextWidth = function (text, cssClass) {
