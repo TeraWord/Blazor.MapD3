@@ -27,6 +27,12 @@ namespace Demo.Pages
         {
             await base.OnInitializedAsync();
 
+            await Task.Delay(1000);
+            Init();
+        }
+
+        private void Init()
+        {
             var data = new TeraWord.Blazor.MapD3.Data();
 
             var items = (new[] {
@@ -97,7 +103,7 @@ namespace Demo.Pages
             //node.Label = "Inside";
             //node.Group = $"{groupA}";
             //node.Color = "orange";
-
+            
             Data = data;
         }
 
