@@ -44,7 +44,6 @@ export function MapD3ZoomToCenter(s) {
     MapD3ZoomTo(tx, ty, s);
 }
 
-
 export function MapD3ZoomTo(x, y, s) {
     var transform = d3.zoomIdentity.translate(x, y).scale(s);
 
@@ -172,9 +171,8 @@ function MapD3(width, height, div, action, onNodeClick) {
         .extent([[0, 0], [this.Width, this.Height]])
         .scaleExtent([0.1, 10])
         .on("zoom", function (evt) {
-            _MapD3.Layers.attr("transform", evt.transform);
-            //_MapD3.Layers.attr("transform", "translate(" + evt.transform.x + "," + evt.transform.y + ") scale(" + evt.transform.k + ")");
-
+            //map.Layers.attr("transform", evt.transform);
+            _MapD3.Layers.attr("transform", "translate(" + evt.transform.x + "," + evt.transform.y + ") scale(" + evt.transform.k + ")");
         });
 
     this.Svg.call(this.Zoom);
@@ -419,7 +417,10 @@ MapD3.prototype.OnMouseClick = function (evt, node) {
 };
 
 MapD3.prototype.Bounds = function () {
-    var x = Number.POSITIVE_INFINITY, X = Number.NEGATIVE_INFINITY, y = Number.POSITIVE_INFINITY, Y = Number.NEGATIVE_INFINITY;
+    var x = Number.POSITIVE_INFINITY;
+    var X = Number.NEGATIVE_INFINITY;
+    var y = Number.POSITIVE_INFINITY;
+    var Y = Number.NEGATIVE_INFINITY;
 
     this.NodeLayer.selectAll(".d3node").each(function (v) {
         x = Math.min(x, v.x - v.width / 2);
@@ -427,6 +428,13 @@ MapD3.prototype.Bounds = function () {
         y = Math.min(y, v.y - v.height / 2);
         Y = Math.max(Y, v.y + v.height / 2);
     });
+
+    if (x === Number.POSITIVE_INFINITY) {
+        x = 0;
+        X = this.Width;
+        y = 0;
+        Y = this.Height;
+    }
 
     return { x: x, X: X, y: y, Y: Y };
 }
