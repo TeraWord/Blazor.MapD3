@@ -3,12 +3,12 @@
   "defaultProvider": "cdnjs",
   "libraries": [
     {
-      "library": "d3@6.7.0",
-      "destination": "wwwroot/lib/d3/"
-    },
-    {
       "library": "jquery@3.6.0",
       "destination": "wwwroot/lib/jquery/"
+    },
+    {
+      "library": "d3@6.7.0",
+      "destination": "wwwroot/lib/d3/"
     },
     {
       "library": "font-awesome@5.15.3",
