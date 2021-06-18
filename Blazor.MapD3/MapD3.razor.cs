@@ -28,16 +28,17 @@ namespace TeraWord.Blazor.MapD3
 
         [Parameter] public bool ShowControls { get; set; }
 
+        [Parameter] public int LinkDistance { get => _LinkDistance; set { if (_LinkDistance != value) { _LinkDistance = value; _ = SetLinkDistance(value); } } }
+        private int _LinkDistance = 60;
+         
+        [Parameter] public int LinkLengths { get => _LinkLengths; set { if (_LinkLengths != value) { _LinkLengths = value; _ = SetLinkLengths(value); } } }
+        private int _LinkLengths = 20;
+
         [Parameter] public EventCallback<Node> OnNodeClick { get; set; }
+        
+        private DotNetObjectReference<MapD3> Instance { get; set; }
 
-        [JSInvokable] public async Task OnInternalNodeClick(Node node)
-        {
-            await OnNodeClick.InvokeAsync(node);
-        }
-
-        private DotNetObjectReference<MapD3> Instance;
-
-        private IJSObjectReference Module;
+        private IJSObjectReference Module { get; set; }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
@@ -51,11 +52,17 @@ namespace TeraWord.Blazor.MapD3
                     Module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./_content/teraword.blazor.mapd3/mapd3.js");
                 }
                 if (Instance is null) Instance = DotNetObjectReference.Create(this);
-                if (Module is not null) await Module.InvokeVoidAsync("MapD3Init", ID, Width, Height, Instance, Service);
+                if (Module is not null) await Module.InvokeVoidAsync("MapD3Init", ID, Width, Height, LinkDistance, LinkLengths, Instance, Service);
         
                 await Update();
                 await ZoomToCenter(1.5);
             }   
+        }
+
+        [JSInvokable]
+        public async Task OnInternalNodeClick(Node node)
+        {
+            await OnNodeClick.InvokeAsync(node);
         }
 
         private async void Clicked()
@@ -89,6 +96,16 @@ namespace TeraWord.Blazor.MapD3
         public async Task ZoomToCenter(double s)
         {
             if (Module is not null) await Module.InvokeVoidAsync("MapD3ZoomToCenter", s);
+        }
+
+        private async Task SetLinkDistance(int distance)
+        {
+            if (Module is not null) await Module.InvokeVoidAsync("MapD3SetLinkDistance", distance);
+        }
+
+        private async Task SetLinkLengths(int lengths)
+        {
+            if (Module is not null) await Module.InvokeVoidAsync("MapD3SetSymmetricDiffLinkLengths", lengths);
         }
 
         public async Task Update()

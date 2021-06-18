@@ -19,6 +19,10 @@ namespace Demo.Pages
 
         private string NodeJson { get; set; }
 
+        private int LinkDistance { get; set; } = 50;
+
+        private int LinkLengths { get; set; } = 20;
+
         private MapD3 MapD3 { get; set; }
 
         private Random rnd = new();
@@ -103,7 +107,7 @@ namespace Demo.Pages
             //node.Label = "Inside";
             //node.Group = $"{groupA}";
             //node.Color = "orange";
-            
+
             Data = data;
         }
 
@@ -148,7 +152,7 @@ namespace Demo.Pages
         {
             get
             {
-                var icons = new string[] { "coffee", "cog", "cogs", "comment",  "comments", "copyright", "credit-card", "crop", "crosshairs", "cube", "cubes", "database", "deaf", "desktop" };
+                var icons = new string[] { "coffee", "cog", "cogs", "comment", "comments", "copyright", "credit-card", "crop", "crosshairs", "cube", "cubes", "database", "deaf", "desktop" };
 
                 return icons[rnd.Next(icons.Length)];
             }
@@ -196,7 +200,7 @@ namespace Demo.Pages
         private void OnRemoveClick(dynamic e)
         {
             var node = Data.Nodes.FirstOrDefault(x => Guid.Parse(x.Code).Equals(child));
-            
+
             if (node is not null)
             {
                 Data.Nodes.Remove(node);
@@ -244,6 +248,16 @@ namespace Demo.Pages
             node.Color = "lime";
 
             Data = Data;
+        }
+
+        private void OnLinkDistanceChange(dynamic e)
+        {
+            LinkDistance = int.Parse(e.Value);
+        }
+
+        private void OnLinkLengthsChange(dynamic e)
+        {
+            LinkLengths = int.Parse(e.Value);
         }
     }
 }
