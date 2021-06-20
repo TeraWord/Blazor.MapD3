@@ -8,4 +8,8 @@
     <ProjectReference Include="..\Blazor.MapD3\Blazor.MapD3.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\img\" />
+  </ItemGroup>
+
 </Project>
