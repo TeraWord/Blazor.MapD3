@@ -304,7 +304,7 @@ MapD3.prototype.Update = function (graph) {
         .attr("height", 32)
         .attr("x", d => d.iconX).attr("y", d => d.iconY)
         .append("xhtml:body").attr("class", "d3awesome")
-        .html(d => '<i class="fa fa-' + d.icon + '"></i>');
+        .html(d => '<i class="fas fa-' + d.icon + '"></i>');
 
     node.filter(function (d) { return d.header !== null; })
         .append("text").attr("class", "d3labelHeader")
