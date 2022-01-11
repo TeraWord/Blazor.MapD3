@@ -1,13 +1,14 @@
 ﻿var _MapD3;
 var _MapD3Instance;
 
-export function MapD3Init(div, width, height, instance, service) {
+//-- Exports ---------------------------------------------------------------------------------------//
+
+export function MapD3Init(div, width, height, linkDistance, linkLengths, instance, service) {
     _MapD3Instance = instance;
-    _MapD3 = new MapD3(width, height, div, service, MapD3OnInternalNodeClick);
-    //if(service != null) _MapD3.UpdateService(_MapD3);
+    _MapD3 = new MapD3(div, width, height, linkDistance, linkLengths, service, MapD3OnInternalNodeClick);
 }
 
-function MapD3UpdateService() {
+export function MapD3UpdateService() {
     _MapD3.UpdateService(_MapD3);
 }
 
@@ -50,30 +51,13 @@ export function MapD3ZoomTo(x, y, s) {
     _MapD3.Svg.call(_MapD3.Zoom.transform, transform);
 }
 
-function MapD3OnInternalNodeClick(e) {
-    var node = Object.assign({}, e);
+export function MapD3SetLinkDistance(distance) {
+    _MapD3.Cola.linkDistance(distance);
+};
 
-    _MapD3Instance.invokeMethodAsync('OnInternalNodeClick', node);
-}
-
-function NewGroup(e) {
-    return {
-        index: e.index,
-        code: e.code,
-        leaves: e.leaves,
-        groups: e.groups,
-        color: e.color
-    };
-}
-
-function NewLink(e) {
-    return {
-        code: e.code,
-        source: e.source,
-        target: e.target,
-        selected: e.selected
-    };
-}
+export function MapD3SetSymmetricDiffLinkLengths(lengths) {
+    _MapD3.Cola.symmetricDiffLinkLengths(lengths);
+};
 
 function NewNode(e, x, y) {
     return {
@@ -99,39 +83,7 @@ function NewNode(e, x, y) {
     };
 }
 
-function MergeGroup(e, group) {
-    group.index = e.index;
-    group.leaves = e.leaves;
-    group.groups = e.groups;
-    group.color = e.color;
-}
-
-function MergeLink(e, link) {
-    link.selected = e.selected;
-}
-
-function MergeNode(e, node) {
-    node.index = e.index;
-    node.label = e.label;
-    node.icon = e.icon;
-    node.parents = e.parents;
-    node.group = e.group;
-    node.tooltip = e.tooltip;
-    node.color = e.color;
-    node.header = e.header;
-    node.footer = e.footer;
-    node.data = e.data;
-    node.width = e.width;
-    node.height = e.height;
-    node.roundX = e.roundX;
-    node.roundY = e.roundY;
-    node.iconX = e.iconX;
-    node.iconY = e.iconY;
-}
-
-/* -----------------------------------------------------------------------------------------------------------------------------  */
-
-function MapD3(width, height, div, action, onNodeClick) {
+function MapD3(div, width, height, linkDistance, linkLengths, action, onNodeClick) {
     this.Div = div;
     this.IsMouseDown = false;
     this.Action = action;
@@ -145,7 +97,8 @@ function MapD3(width, height, div, action, onNodeClick) {
     this.Cola = cola.d3adaptor(d3)
         .avoidOverlaps(true)
         .handleDisconnected(true)
-        .linkDistance(60)
+        .linkDistance(linkDistance)
+        .symmetricDiffLinkLengths(linkLengths)
         .size([this.Width, this.Height]);
 
     this.Svg = d3.select('#' + div)
@@ -380,7 +333,7 @@ MapD3.prototype.Update = function (graph) {
         .attr("height", 32)
         .attr("x", d => d.iconX).attr("y", d => d.iconY)
         .append("xhtml:body").attr("class", "d3awesome")
-        .html(d => '<i class="fa fa-' + d.icon + '"></i>');
+        .html(d => '<i class="fas fa-' + d.icon + '"></i>');
 
     node.filter(function (d) { return d.header !== null; })
         .append("text").attr("class", "d3labelHeader")
@@ -447,3 +400,85 @@ MapD3.prototype.Bounds = function () {
 
     return { x: x, X: X, y: y, Y: Y };
 }
+
+//---------------------------------------------------------------------------------------------------//
+
+
+function MapD3OnInternalNodeClick(e) {
+    var node = Object.assign({}, e);
+
+    _MapD3Instance.invokeMethodAsync('OnInternalNodeClick', node);
+}
+
+function NewGroup(e) {
+    return {
+        index: e.index,
+        code: e.code,
+        leaves: e.leaves,
+        groups: e.groups,
+        color: e.color
+    };
+}
+
+function NewLink(e) {
+    return {
+        code: e.code,
+        source: e.source,
+        target: e.target,
+        selected: e.selected
+    };
+}
+
+function NewNode(e) {
+    return {
+        index: e.index,
+        code: e.code,
+        label: e.label,
+        icon: e.icon,
+        parents: e.parents,
+        group: e.group,
+        tooltip: e.tooltip,
+        color: e.color,
+        header: e.header,
+        footer: e.footer,
+        data: e.data,
+        width: e.width,
+        height: e.height,
+        roundX: e.roundX,
+        roundY: e.roundY,
+        iconX: e.iconX,
+        iconY: e.iconY,
+    };
+}
+
+function MergeGroup(e, group) {
+    group.index = e.index;
+    group.leaves = e.leaves;
+    group.groups = e.groups;
+    group.color = e.color;
+}
+
+function MergeLink(e, link) {
+    link.selected = e.selected;
+}
+
+function MergeNode(e, node) {
+    node.index = e.index;
+    node.label = e.label;
+    node.icon = e.icon;
+    node.parents = e.parents;
+    node.group = e.group;
+    node.tooltip = e.tooltip;
+    node.color = e.color;
+    node.header = e.header;
+    node.footer = e.footer;
+    node.data = e.data;
+    node.width = e.width;
+    node.height = e.height;
+    node.roundX = e.roundX;
+    node.roundY = e.roundY;
+    node.iconX = e.iconX;
+    node.iconY = e.iconY;
+}
+
+/* -----------------------------------------------------------------------------------------------------------------------------  */
