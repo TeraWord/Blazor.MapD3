@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <Company>TeraWord</Company>
     <Product>MapD3</Product>
     <Authors>Marcello Marcellino</Authors>
@@ -14,8 +14,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Components" Version="6.0.1" />
-    <PackageReference Include="Microsoft.JSInterop.WebAssembly" Version="6.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Components" Version="5.0.13" />
+    <PackageReference Include="Microsoft.JSInterop.WebAssembly" Version="5.0.13" />
   </ItemGroup>
 
   <ItemGroup>
