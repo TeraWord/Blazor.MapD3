@@ -59,30 +59,6 @@ export function MapD3SetSymmetricDiffLinkLengths(lengths) {
     _MapD3.Cola.symmetricDiffLinkLengths(lengths);
 };
 
-function NewNode(e, x, y) {
-    return {
-        index: e.index,
-        code: e.code,
-        label: e.label,
-        icon: e.icon,
-        parents: e.parents,
-        group: e.group,
-        tooltip: e.tooltip,
-        color: e.color,
-        header: e.header,
-        footer: e.footer,
-        data: e.data,
-        width: e.width,
-        height: e.height,
-        roundX: e.roundX,
-        roundY: e.roundY,
-        iconX: e.iconX,
-        iconY: e.iconY,
-        x: x,
-        y: y
-    };
-}
-
 function MapD3(div, width, height, linkDistance, linkLengths, action, onNodeClick) {
     this.Div = div;
     this.IsMouseDown = false;
@@ -403,7 +379,6 @@ MapD3.prototype.Bounds = function () {
 
 //---------------------------------------------------------------------------------------------------//
 
-
 function MapD3OnInternalNodeClick(e) {
     var node = Object.assign({}, e);
 
@@ -429,7 +404,7 @@ function NewLink(e) {
     };
 }
 
-function NewNode(e) {
+function NewNode(e, x, y) {
     return {
         index: e.index,
         code: e.code,
@@ -448,6 +423,8 @@ function NewNode(e) {
         roundY: e.roundY,
         iconX: e.iconX,
         iconY: e.iconY,
+        x: x,
+        y: y
     };
 }
 
