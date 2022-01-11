@@ -88,7 +88,7 @@ namespace TeraWord.Blazor.MapD3
             Links = (from l in Links orderby l.Target, l.Source select l).ToList();
 
 #if DEBUG
-            System.IO.File.WriteAllText("D:/Tests/Blazor.MapD3/Data.json", System.Text.Json.JsonSerializer.Serialize(this, new() { WriteIndented = true }));
+            //System.IO.File.WriteAllText("D:/Tests/Blazor.MapD3/Data.json", System.Text.Json.JsonSerializer.Serialize (this, new() { WriteIndented = true }));
 #endif
 
             return this;
