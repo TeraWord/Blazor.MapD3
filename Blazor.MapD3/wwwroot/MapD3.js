@@ -75,7 +75,7 @@ function NewLink(e) {
     };
 }
 
-function NewNode(e) {
+function NewNode(e, x, y) {
     return {
         index: e.index,
         code: e.code,
@@ -94,6 +94,8 @@ function NewNode(e) {
         roundY: e.roundY,
         iconX: e.iconX,
         iconY: e.iconY,
+        x: x,
+        y: y
     };
 }
 
@@ -271,10 +273,17 @@ MapD3.prototype.SyncGraph = function (graph) {
     }
 
     if (graph.nodes != null) {
-        graph.nodes.forEach(x => {
+        graph.nodes.forEach(nodeNew => {
             var found = false;
-            this.Nodes.forEach(y => { if (x.code === y.code) { found = true; MergeNode(x, y); } });
-            if (!found) this.Nodes.push(NewNode(x));
+
+            this.Nodes.forEach(nodeOld => { if (nodeNew.code === nodeOld.code) { found = true; MergeNode(nodeNew, nodeOld); } });
+
+            if (!found) {
+                var parentCode = nodeNew.parents[0];
+                var parent = null;
+                this.Nodes.forEach(node => { if (node.code === parentCode) { parent = node; } });
+                this.Nodes.push(NewNode(nodeNew, parent?.x ?? 0, parent?.y ?? 0));
+            }
         });
 
         this.Nodes = this.Nodes.filter(function (x) {
