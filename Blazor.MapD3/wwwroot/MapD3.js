@@ -170,7 +170,7 @@ MapD3.prototype.SyncGraph = function (graph) {
     if (graph.groups != null) {
         graph.groups.forEach(x => {
             var found = false;
-            this.Groups.forEach(y => { if (x.code === y.code) found = true; MergeGroup(x, y); });
+            this.Groups.forEach(y => { if (x.code === y.code) { found = true; MergeGroup(x, y); } });
             if (!found) this.Groups.push(NewGroup(x));
         });
 
@@ -187,7 +187,7 @@ MapD3.prototype.SyncGraph = function (graph) {
     if (graph.links != null) {
         graph.links.forEach(x => {
             var found = false;
-            this.Links.forEach(y => { if (x.code === y.code) found = true; MergeLink(x, y); });
+            this.Links.forEach(y => { if (x.code === y.code) { found = true; MergeLink(x, y); } });
             if (!found) this.Links.push(NewLink(x));
         });
 
