@@ -113,6 +113,12 @@ namespace TeraWord.Blazor.MapD3
             if (Module is not null) await Module.InvokeVoidAsync("MapD3Update", Data?.Compile());
         }
 
+        public async Task Update(Data data)
+        {
+            _Data = data;
+            await Update();
+        }
+
         public void Dispose()
         {
             if (Instance is not null) Instance.Dispose();
