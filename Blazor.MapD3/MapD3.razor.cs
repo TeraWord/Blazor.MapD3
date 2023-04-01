@@ -50,7 +50,7 @@ namespace TeraWord.Blazor.MapD3
             {
                 if (Module is null)
                 {
-                    await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./_content/teraword.blazor.mapd3/cola.d3v6.js");
+                    await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./_content/teraword.blazor.mapd3/cola.d3v7.js");
                     Module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./_content/teraword.blazor.mapd3/mapd3.js");
                 }
                 if (Instance is null) Instance = DotNetObjectReference.Create(this);

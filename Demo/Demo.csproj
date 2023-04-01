@@ -10,6 +10,5 @@
 
   <ItemGroup>
     <Folder Include="wwwroot\img\" />
-  </ItemGroup>
-
+  </ItemGroup> 
 </Project>
