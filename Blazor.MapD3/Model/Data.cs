@@ -7,6 +7,8 @@ namespace TeraWord.Blazor.MapD3
 {
     public class Data
     {
+        internal Guid ID { get; } = Guid.NewGuid();
+
         public List<Node> Nodes { get; set; } = new();
         public List<Link> Links { get; set; } = new();
         public List<Group> Groups { get; set; } = new();

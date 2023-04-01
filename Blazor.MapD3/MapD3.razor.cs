@@ -30,15 +30,17 @@ namespace TeraWord.Blazor.MapD3
 
         [Parameter] public int LinkDistance { get => _LinkDistance; set { if (_LinkDistance != value) { _LinkDistance = value; _ = SetLinkDistance(value); } } }
         private int _LinkDistance = 60;
-         
+
         [Parameter] public int LinkLengths { get => _LinkLengths; set { if (_LinkLengths != value) { _LinkLengths = value; _ = SetLinkLengths(value); } } }
         private int _LinkLengths = 20;
 
         [Parameter] public EventCallback<Node> OnNodeClick { get; set; }
-        
+
         private DotNetObjectReference<MapD3> Instance { get; set; }
 
         private IJSObjectReference Module { get; set; }
+
+        private Guid LastDataID { get; set; }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
@@ -53,10 +55,10 @@ namespace TeraWord.Blazor.MapD3
                 }
                 if (Instance is null) Instance = DotNetObjectReference.Create(this);
                 if (Module is not null) await Module.InvokeVoidAsync("MapD3Init", ID, Width, Height, LinkDistance, LinkLengths, Instance, Service);
-        
+
                 await Update();
                 await ZoomToCenter(1.5);
-            }   
+            }
         }
 
         [JSInvokable]
@@ -68,6 +70,11 @@ namespace TeraWord.Blazor.MapD3
         private async void Clicked()
         {
             if (Module is not null) await Module.InvokeVoidAsync("MapD3Refresh");
+        }
+
+        private async Task Clear()
+        {
+            if (Module is not null) await Module.InvokeVoidAsync("MapD3Clear");
         }
 
         private string InternalStyle
@@ -110,6 +117,12 @@ namespace TeraWord.Blazor.MapD3
 
         public async Task Update()
         {
+            if (Data is not null && !LastDataID.Equals(Data))
+            {
+                LastDataID = Data.ID;
+                await Clear();
+            }
+
             if (Module is not null) await Module.InvokeVoidAsync("MapD3Update", Data?.Compile());
         }
 
@@ -123,7 +136,7 @@ namespace TeraWord.Blazor.MapD3
         {
             if (Instance is not null) Instance.Dispose();
             Instance = null;
-            
+
             if (Module is not null) Module.DisposeAsync();
             Module = null;
         }

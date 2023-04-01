@@ -120,14 +120,15 @@ namespace Demo.Pages
 
         private void OnRootClick(dynamic e)
         {
-            var node = Data.AddNode($"{root}");
+            var data = new TeraWord.Blazor.MapD3.Data();
+            var node = data.AddNode($"{root}");
 
             node.Label = "Root";
             node.Tooltip = node.Label + " - " + "Descrizione";
             node.Color = 0 switch { 0 => "red", 1 => "green", 2 => "blue", _ => "black" };
             node.Icon = "archive";
 
-            Data = Data;
+            Data = data;
         }
 
         private void OnParentClick(dynamic e)

@@ -16,6 +16,22 @@ export function MapD3Update(data) {
     _MapD3.Update(data);
 }
 
+export function MapD3Clear() {
+    _MapD3.GroupLayer.selectAll("*").remove();
+    _MapD3.LinkLayer.selectAll("*").remove();
+    _MapD3.NodeLayer.selectAll("*").remove();
+
+    _MapD3.Links = [];
+    _MapD3.Nodes = [];
+    _MapD3.Groups = [];
+
+    _MapD3.Cola
+        .groups(_MapD3.Groups)
+        .links(_MapD3.Links)
+        .nodes(_MapD3.Nodes)
+        .start();
+}
+
 export function MapD3ZoomToFit() {
     var b = _MapD3.Bounds(_MapD3);
     var w = b.X - b.x;
