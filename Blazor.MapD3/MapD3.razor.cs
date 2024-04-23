@@ -1,7 +1,10 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -21,7 +24,9 @@ namespace TeraWord.Blazor.MapD3
 
         [Parameter] public string Height { get; set; } = "500px";
 
-        [Parameter] public Data Data { get => _Data; set { _Data = value; _ = Update(); } }
+        [Parameter]
+        //public Data Data { get => _Data; set { if (JsonConvert.SerializeObject(_Data) != JsonConvert.SerializeObject(value)) { _Data = value; _ = Update(); } } }
+        public Data Data { get => _Data; set { _Data = value; _ = Update(); } }
         private Data _Data;
 
         [Parameter] public bool ZoomEnabled { get; set; }
@@ -40,7 +45,7 @@ namespace TeraWord.Blazor.MapD3
 
         private IJSObjectReference Module { get; set; }
 
-        private Guid LastDataID { get; set; }
+        private string LastData { get; set; }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
@@ -53,7 +58,9 @@ namespace TeraWord.Blazor.MapD3
                     await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./_content/teraword.blazor.mapd3/cola.d3v7.js");
                     Module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./_content/teraword.blazor.mapd3/mapd3.js");
                 }
-                if (Instance is null) Instance = DotNetObjectReference.Create(this);
+
+                Instance ??= DotNetObjectReference.Create(this);
+
                 if (Module is not null) await Module.InvokeVoidAsync("MapD3Init", ID, Width, Height, LinkDistance, LinkLengths, Instance, Service);
 
                 await Update();
@@ -67,13 +74,15 @@ namespace TeraWord.Blazor.MapD3
             await OnNodeClick.InvokeAsync(node);
         }
 
-        private async void Clicked()
+        private async Task Clicked()
         {
             if (Module is not null) await Module.InvokeVoidAsync("MapD3Refresh");
         }
 
         private async Task Clear()
         {
+            LastData = null;
+
             if (Module is not null) await Module.InvokeVoidAsync("MapD3Clear");
         }
 
@@ -117,20 +126,13 @@ namespace TeraWord.Blazor.MapD3
 
         public async Task Update()
         {
-            if (Data is not null && !LastDataID.Equals(Data))
+            if (JsonConvert.SerializeObject(Data) != LastData)
             {
-                LastDataID = Data.ID;
-                await Clear();
+                LastData = JsonConvert.SerializeObject(Data);
+
+                if (Module is not null) await Module.InvokeVoidAsync("MapD3Update", Data?.Compile());
             }
-
-            if (Module is not null) await Module.InvokeVoidAsync("MapD3Update", Data?.Compile());
-        }
-
-        public async Task Update(Data data)
-        {
-            _Data = data;
-            await Update();
-        }
+        } 
 
         public void Dispose()
         {

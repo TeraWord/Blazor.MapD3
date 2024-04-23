@@ -1,12 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <Company>TeraWord</Company>
     <Product>MapD3</Product>
     <Authors>Marcello Marcellino</Authors>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.0.22</Version>
+    <Version>1.0.23</Version>
     <RootNamespace>TeraWord.Blazor.MapD3</RootNamespace>
     <AssemblyName>TeraWord.Blazor.MapD3</AssemblyName>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
@@ -14,8 +14,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Components" Version="7.0.4" />
-    <PackageReference Include="Microsoft.JSInterop.WebAssembly" Version="7.0.4" />
+    <PackageReference Include="Microsoft.AspNetCore.Components" Version="8.0.4" />
+    <PackageReference Include="Microsoft.JSInterop.WebAssembly" Version="8.0.4" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
 
   <ItemGroup>

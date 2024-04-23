@@ -7,7 +7,7 @@ namespace TeraWord.Blazor.MapD3
 {
     public class Data
     {
-        internal Guid ID { get; } = Guid.NewGuid();
+        //internal Guid ID { get; private set; } = Guid.NewGuid();
 
         public List<Node> Nodes { get; set; } = new();
         public List<Link> Links { get; set; } = new();
@@ -16,7 +16,7 @@ namespace TeraWord.Blazor.MapD3
         public Data() { }
 
         public Data(IEnumerable<Node> nodes) => Assign(nodes);
-
+        
         public void Assign(IEnumerable<Node> nodes)
         {
             foreach (var node in nodes) AddNode(node);
@@ -97,7 +97,7 @@ namespace TeraWord.Blazor.MapD3
         }
 
         public Group AddGroup(string code, string parent = null)
-        {
+        { 
             Group group = Groups.FirstOrDefault(x => x.Code.Equals(code));
 
             if (group == null)
@@ -140,7 +140,7 @@ namespace TeraWord.Blazor.MapD3
         }
 
         public Node AddNode(Node node)
-        {
+        { 
             var result = AddNode(node.Code);
 
             result.Color = node.Color;
@@ -160,7 +160,7 @@ namespace TeraWord.Blazor.MapD3
         }
 
         public Node AddLinks(string code, IEnumerable<string> parents)
-        {
+        { 
             var node = FindNode(code);
 
             if (node is not null && parents is not null)
