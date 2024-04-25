@@ -5,24 +5,22 @@ using System.Web;
 
 namespace TeraWord.Blazor.MapD3
 {
-    public class Data
+    public class D3Data
     {
-        //internal Guid ID { get; private set; } = Guid.NewGuid();
+        public List<D3Node> Nodes { get; set; } = new();
+        public List<D3Link> Links { get; set; } = new();
+        public List<D3Group> Groups { get; set; } = new();
 
-        public List<Node> Nodes { get; set; } = new();
-        public List<Link> Links { get; set; } = new();
-        public List<Group> Groups { get; set; } = new();
+        public D3Data() { }
 
-        public Data() { }
-
-        public Data(IEnumerable<Node> nodes) => Assign(nodes);
+        public D3Data(IEnumerable<D3Node> nodes) => Assign(nodes);
         
-        public void Assign(IEnumerable<Node> nodes)
+        public void Assign(IEnumerable<D3Node> nodes)
         {
             foreach (var node in nodes) AddNode(node);
         }
 
-        internal Data Compile()
+        internal D3Data Compile()
         {
             Links.Clear();
 
@@ -54,7 +52,7 @@ namespace TeraWord.Blazor.MapD3
 
                             if ((foundIn.Count() == 0) && (foundOut.Count() == 0))
                             {
-                                var link = new Link();
+                                var link = new D3Link();
                                 link.Source = contChild;
                                 link.Target = contParent;
                                 link.Code = $"{parent}-{child.Code}";
@@ -96,13 +94,13 @@ namespace TeraWord.Blazor.MapD3
             return this;
         }
 
-        public Group AddGroup(string code, string parent = null)
+        public D3Group AddGroup(string code, string parent = null)
         { 
-            Group group = Groups.FirstOrDefault(x => x.Code.Equals(code));
+            D3Group group = Groups.FirstOrDefault(x => x.Code.Equals(code));
 
             if (group == null)
             {
-                group = new Group();
+                group = new D3Group();
                 group.Code = code;
                 Groups.Add(group);
             }
@@ -115,7 +113,7 @@ namespace TeraWord.Blazor.MapD3
             return group;
         }
 
-        public Node FindNode(string code)
+        public D3Node FindNode(string code)
         {
             return Nodes?.FirstOrDefault(x => x.Code.Equals(code));
         }
@@ -125,13 +123,13 @@ namespace TeraWord.Blazor.MapD3
             return FindNode(code) is not null;
         }
 
-        public Node AddNode(string code, string parent = null)
+        public D3Node AddNode(string code, string parent = null)
         {
             var node = FindNode(code);
 
             if (node is null)
             {
-                node = new Node();
+                node = new D3Node();
                 node.Code = code;
                 Nodes.Add(node);
             }
@@ -139,7 +137,7 @@ namespace TeraWord.Blazor.MapD3
             return AddLink(node.Code, parent);
         }
 
-        public Node AddNode(Node node)
+        public D3Node AddNode(D3Node node)
         { 
             var result = AddNode(node.Code);
 
@@ -154,12 +152,12 @@ namespace TeraWord.Blazor.MapD3
             return AddLinks(result.Code, node.Parents);
         }
 
-        public Node AddLink(string code, string parent)
+        public D3Node AddLink(string code, string parent)
         {
             return AddLinks(code, new string[] { parent });
         }
 
-        public Node AddLinks(string code, IEnumerable<string> parents)
+        public D3Node AddLinks(string code, IEnumerable<string> parents)
         { 
             var node = FindNode(code);
 

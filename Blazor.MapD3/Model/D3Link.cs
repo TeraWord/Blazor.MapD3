@@ -1,6 +1,6 @@
 ﻿namespace TeraWord.Blazor.MapD3
 {
-    public class Link
+    public class D3Link
     {
         public string Code { get; set; }
 

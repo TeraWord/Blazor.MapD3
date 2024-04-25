@@ -2,7 +2,7 @@
 
 namespace TeraWord.Blazor.MapD3
 {
-    public class Group
+    public class D3Group
     {
         public int Index { get; internal set; }
 

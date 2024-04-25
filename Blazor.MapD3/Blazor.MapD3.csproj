@@ -6,11 +6,11 @@
     <Product>MapD3</Product>
     <Authors>Marcello Marcellino</Authors>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.0.25</Version>
+    <Version>1.0.26</Version>
     <RootNamespace>TeraWord.Blazor.MapD3</RootNamespace>
     <AssemblyName>TeraWord.Blazor.MapD3</AssemblyName>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
-    <Copyright>2022 By TeraWord</Copyright>
+    <Copyright>2024 By TeraWord</Copyright>
   </PropertyGroup>
 
   <ItemGroup>

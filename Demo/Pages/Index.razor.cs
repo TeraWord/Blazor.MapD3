@@ -10,7 +10,7 @@ namespace Demo.Pages
 {
     public partial class Index
     {
-        private TeraWord.Blazor.MapD3.Data Data { get; set; }
+        private D3Data Data { get; set; }
 
         private Guid root = new Guid("{646DBB8D-B1D2-43F2-BD9C-4FE3E27BD0BA}");
         private Guid parent;
@@ -36,7 +36,7 @@ namespace Demo.Pages
 
         private void Init()
         {
-            Data = new TeraWord.Blazor.MapD3.Data();
+            Data = new TeraWord.Blazor.MapD3.D3Data();
 
             var items = (new[] {
                 new {
@@ -76,7 +76,7 @@ namespace Demo.Pages
                 Footer = (string)null
             });
 
-            Node node;
+            D3Node node;
 
             foreach (var item in items)
             {
@@ -110,7 +110,7 @@ namespace Demo.Pages
             MapD3.Data = Data;
         }
 
-        private async Task OnNodeClick(Node node)
+        private async Task OnNodeClick(D3Node node)
         {
             var json = JsonSerializer.Serialize(node, new JsonSerializerOptions { WriteIndented = true });
             NodeJson = json;
@@ -119,7 +119,7 @@ namespace Demo.Pages
 
         private async Task OnRootClick(dynamic e)
         {
-            var data = new TeraWord.Blazor.MapD3.Data();
+            var data = new TeraWord.Blazor.MapD3.D3Data();
             var node = data.AddNode($"{root}");
 
             node.Label = "Root";

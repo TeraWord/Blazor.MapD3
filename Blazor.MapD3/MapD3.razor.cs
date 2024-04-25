@@ -24,7 +24,7 @@ namespace TeraWord.Blazor.MapD3
 
         [Parameter] public string Height { get; set; } = "500px";
 
-        public Data Data { get; set; }
+        public D3Data Data { get; set; }
 
         [Parameter] public bool ZoomEnabled { get; set; }
 
@@ -34,7 +34,7 @@ namespace TeraWord.Blazor.MapD3
 
         [Parameter] public int LinkLengths { get; set; } = 20;
 
-        [Parameter] public EventCallback<Node> OnNodeClick { get; set; }
+        [Parameter] public EventCallback<D3Node> OnNodeClick { get; set; }
 
         private DotNetObjectReference<MapD3> Instance { get; set; }
 
@@ -64,7 +64,7 @@ namespace TeraWord.Blazor.MapD3
         }
 
         [JSInvokable]
-        public async Task OnInternalNodeClick(Node node)
+        public async Task OnInternalNodeClick(D3Node node)
         {
             await OnNodeClick.InvokeAsync(node);
         }

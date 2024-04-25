@@ -3,7 +3,7 @@ using System.Collections.ObjectModel;
 
 namespace TeraWord.Blazor.MapD3
 {
-    public sealed class Node
+    public sealed class D3Node
     {
         public int Index { get; internal set; }
 
