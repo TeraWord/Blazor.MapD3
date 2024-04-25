@@ -24,10 +24,7 @@ namespace TeraWord.Blazor.MapD3
 
         [Parameter] public string Height { get; set; } = "500px";
 
-        [Parameter]
-        //public Data Data { get => _Data; set { if (JsonConvert.SerializeObject(_Data) != JsonConvert.SerializeObject(value)) { _Data = value; _ = Update(); } } }
-        public Data Data { get => _Data; set { _Data = value; _ = Update(); } }
-        private Data _Data;
+        public Data Data { get; set; }
 
         [Parameter] public bool ZoomEnabled { get; set; }
 
@@ -114,12 +111,12 @@ namespace TeraWord.Blazor.MapD3
             if (Module is not null) await Module.InvokeVoidAsync("MapD3ZoomToCenter", s);
         }
 
-        private async Task SetLinkDistance(int distance)
+        public async Task SetLinkDistance(int distance)
         {
             if (Module is not null) await Module.InvokeVoidAsync("MapD3SetLinkDistance", distance);
         }
 
-        private async Task SetLinkLengths(int lengths)
+        public async Task SetLinkLengths(int lengths)
         {
             if (Module is not null) await Module.InvokeVoidAsync("MapD3SetSymmetricDiffLinkLengths", lengths);
         }

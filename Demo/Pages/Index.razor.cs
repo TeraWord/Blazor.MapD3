@@ -26,18 +26,17 @@ namespace Demo.Pages
         private MapD3 MapD3 { get; set; }
 
         private Random rnd = new();
-
-        protected override async Task OnInitializedAsync()
+                 
+        protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            await base.OnInitializedAsync();
+            await base.OnAfterRenderAsync(firstRender);
 
-            await Task.Delay(1000);
-            Init();
+            if (firstRender) Init();
         }
 
         private void Init()
         {
-            var data = new TeraWord.Blazor.MapD3.Data();
+            Data = new TeraWord.Blazor.MapD3.Data();
 
             var items = (new[] {
                 new {
@@ -81,7 +80,7 @@ namespace Demo.Pages
 
             foreach (var item in items)
             {
-                node = data.AddNode(item.Code.ToString(), item.Parent.ToString());
+                node = Data.AddNode(item.Code.ToString(), item.Parent.ToString());
                 node.Label = item.Label;
                 node.Tooltip = item.Label + " - " + item.Description;
                 node.Color = item.Status switch { 0 => "red", 1 => "green", 2 => "blue", _ => "black" };
@@ -108,7 +107,7 @@ namespace Demo.Pages
             //node.Group = $"{groupA}";
             //node.Color = "orange";
 
-            Data = data;
+            MapD3.Data = Data;
         }
 
         private async Task OnNodeClick(Node node)
@@ -118,7 +117,7 @@ namespace Demo.Pages
             await Task.CompletedTask;
         }
 
-        private void OnRootClick(dynamic e)
+        private async Task OnRootClick(dynamic e)
         {
             var data = new TeraWord.Blazor.MapD3.Data();
             var node = data.AddNode($"{root}");
@@ -128,10 +127,12 @@ namespace Demo.Pages
             node.Color = 0 switch { 0 => "red", 1 => "green", 2 => "blue", _ => "black" };
             node.Icon = "archive";
 
-            Data = data;
+            MapD3.Data = data;
+
+            await MapD3.Update();
         }
 
-        private void OnParentClick(dynamic e)
+        private async Task OnParentClick(dynamic e)
         {
             child = Guid.NewGuid();
 
@@ -146,7 +147,9 @@ namespace Demo.Pages
 
             parent = child;
 
-            Data = Data;
+            MapD3.Data = Data;
+
+            await MapD3.Update();
         }
 
         private string RndIcon
@@ -159,7 +162,7 @@ namespace Demo.Pages
             }
         }
 
-        private void OnChildClick(dynamic e)
+        private async Task OnChildClick(dynamic e)
         {
             child = Guid.NewGuid();
 
@@ -176,16 +179,21 @@ namespace Demo.Pages
             node.RoundY = 16;
             node.IconX = 4;
             node.IconY = 2;
-            Data = Data;
+
+            MapD3.Data = Data;
+            await MapD3.Update();
         }
 
-        private void OnLinkClick(dynamic e)
+        private async Task OnLinkClick(dynamic e)
         {
             Data.AddLink($"{child}", $"{root}");
-            Data = Data;
+
+            MapD3.Data = Data;
+
+            await MapD3.Update();
         }
 
-        private void OnLonelyClick(dynamic e)
+        private async Task OnLonelyClick(dynamic e)
         {
             child = Guid.NewGuid();
 
@@ -195,10 +203,12 @@ namespace Demo.Pages
             node.Tooltip = node.Label + " - " + "Lonely";
             node.Color = 2 switch { 0 => "red", 1 => "green", 2 => "blue", _ => "black" };
 
-            Data = Data;
+            MapD3.Data = Data;
+
+            await MapD3.Update();
         }
 
-        private void OnRemoveClick(dynamic e)
+        private async Task OnRemoveClick(dynamic e)
         {
             var node = Data.Nodes.FirstOrDefault(x => Guid.Parse(x.Code).Equals(child));
 
@@ -206,11 +216,14 @@ namespace Demo.Pages
             {
                 Data.Nodes.Remove(node);
                 child = Guid.Parse(Data.Nodes.LastOrDefault()?.Code ?? Guid.Empty.ToString());
-                Data = Data;
+               
+                MapD3.Data = Data;
+
+                await MapD3.Update();
             }
         }
 
-        private async void OnZoomToFitClick(dynamic e)
+        private async Task OnZoomToFitClick(dynamic e)
         {
             await MapD3.ZoomToFit();
         }
@@ -223,7 +236,7 @@ namespace Demo.Pages
             }
         }
 
-        private void OnGroupClick(dynamic e)
+        private async Task OnGroupClick(dynamic e)
         {
             groupA = Guid.NewGuid();
             var group = Data.AddGroup($"{groupA}");
@@ -236,10 +249,12 @@ namespace Demo.Pages
             node.Group = $"{groupA}";
             node.Color = "orange";
 
-            Data = Data;
+            MapD3.Data = Data;
+
+            await MapD3.Update();
         }
 
-        private void OnInsideClick(dynamic e)
+        private async Task OnInsideClick(dynamic e)
         {
             child = Guid.NewGuid();
 
@@ -248,7 +263,9 @@ namespace Demo.Pages
             node.Group = $"{groupA}";
             node.Color = "lime";
 
-            Data = Data;
+            MapD3.Data = Data;
+
+            await MapD3.Update();
         }
 
         private void OnLinkDistanceChange(dynamic e)
