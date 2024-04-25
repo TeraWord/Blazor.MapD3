@@ -30,11 +30,9 @@ namespace TeraWord.Blazor.MapD3
 
         [Parameter] public bool ShowControls { get; set; }
 
-        [Parameter] public int LinkDistance { get => _LinkDistance; set { if (_LinkDistance != value) { _LinkDistance = value; _ = SetLinkDistance(value); } } }
-        private int _LinkDistance = 60;
+        [Parameter] public int LinkDistance { get; set; } = 60;
 
-        [Parameter] public int LinkLengths { get => _LinkLengths; set { if (_LinkLengths != value) { _LinkLengths = value; _ = SetLinkLengths(value); } } }
-        private int _LinkLengths = 20;
+        [Parameter] public int LinkLengths { get; set; } = 20;
 
         [Parameter] public EventCallback<Node> OnNodeClick { get; set; }
 

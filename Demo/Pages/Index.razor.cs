@@ -268,14 +268,14 @@ namespace Demo.Pages
             await MapD3.Update();
         }
 
-        private void OnLinkDistanceChange(dynamic e)
+        private async Task OnLinkDistanceChange(dynamic e)
         {
-            LinkDistance = int.Parse(e.Value);
+           await MapD3.SetLinkDistance(int.Parse(e.Value));
         }
 
-        private void OnLinkLengthsChange(dynamic e)
+        private async Task OnLinkLengthsChange(dynamic e)
         {
-            LinkLengths = int.Parse(e.Value);
+           await MapD3.SetLinkLengths(int.Parse(e.Value));
         }
     }
 }
