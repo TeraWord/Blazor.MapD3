@@ -69,10 +69,12 @@ export function MapD3ZoomTo(x, y, s) {
 
 export function MapD3SetLinkDistance(distance) {
     _MapD3.Cola.linkDistance(distance);
+    _MapD3.Cola.start();
 };
 
 export function MapD3SetSymmetricDiffLinkLengths(lengths) {
     _MapD3.Cola.symmetricDiffLinkLengths(lengths);
+    _MapD3.Cola.start();
 };
 
 function MapD3(div, width, height, linkDistance, linkLengths, action, onNodeClick) {

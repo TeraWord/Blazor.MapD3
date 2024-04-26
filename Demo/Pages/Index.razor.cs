@@ -23,7 +23,7 @@ namespace Demo.Pages
 
         private int LinkLengths { get; set; } = 20;
 
-        private MapD3 MapD3 { get; set; }
+        private D3Map MapD3 { get; set; }
 
         private Random rnd = new();
                  

@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace TeraWord.Blazor.MapD3
 {
-    public partial class MapD3 : ComponentBase, IDisposable
+    public partial class D3Map : ComponentBase, IDisposable
     {
         [Inject] private IJSRuntime JSRuntime { get; set; }
 
@@ -36,7 +36,7 @@ namespace TeraWord.Blazor.MapD3
 
         [Parameter] public EventCallback<D3Node> OnNodeClick { get; set; }
 
-        private DotNetObjectReference<MapD3> Instance { get; set; }
+        private DotNetObjectReference<D3Map> Instance { get; set; }
 
         private IJSObjectReference Module { get; set; }
 
