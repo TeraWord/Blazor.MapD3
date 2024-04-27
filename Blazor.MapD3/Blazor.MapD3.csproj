@@ -11,6 +11,7 @@
     <AssemblyName>TeraWord.Blazor.MapD3</AssemblyName>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <Copyright>2024 By TeraWord</Copyright>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -23,6 +24,10 @@
     <None Include="..\LICENSE">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
+    </None>
+    <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
     </None>
   </ItemGroup>
 
