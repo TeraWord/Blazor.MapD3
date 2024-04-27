@@ -12,7 +12,7 @@ export function MapD3UpdateService() {
     _MapD3.UpdateService(_MapD3);
 }
 
-export function MapD3Update(data) {
+export function MapD3Update(data) {    
     _MapD3.Update(data);
 }
 

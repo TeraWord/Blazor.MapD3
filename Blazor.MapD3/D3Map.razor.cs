@@ -74,9 +74,10 @@ namespace TeraWord.Blazor.MapD3
             if (Module is not null) await Module.InvokeVoidAsync("MapD3Refresh");
         }
 
-        private async Task Clear()
+        public async Task Clear()
         {
-            LastData = null;
+            Data = new();
+            LastData = JsonConvert.SerializeObject(Data);
 
             if (Module is not null) await Module.InvokeVoidAsync("MapD3Clear");
         }
@@ -127,7 +128,7 @@ namespace TeraWord.Blazor.MapD3
 
                 if (Module is not null) await Module.InvokeVoidAsync("MapD3Update", Data?.Compile());
             }
-        } 
+        }
 
         public void Dispose()
         {

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Threading.Tasks;
 using TeraWord.Blazor.MapD3;
@@ -26,17 +27,21 @@ namespace Demo.Pages
         private D3Map MapD3 { get; set; }
 
         private Random rnd = new();
-                 
+
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             await base.OnAfterRenderAsync(firstRender);
 
-            if (firstRender) Init();
+            if (firstRender)
+            {
+                Data = BuildRoot();
+                MapD3.Data = Data;
+            }
         }
 
-        private void Init()
+        private D3Data BuildRoot()
         {
-            Data = new TeraWord.Blazor.MapD3.D3Data();
+            var result = new D3Data();
 
             var items = (new[] {
                 new {
@@ -80,7 +85,7 @@ namespace Demo.Pages
 
             foreach (var item in items)
             {
-                node = Data.AddNode(item.Code.ToString(), item.Parent.ToString());
+                node = result.AddNode(item.Code.ToString(), item.Parent.ToString());
                 node.Label = item.Label;
                 node.Tooltip = item.Label + " - " + item.Description;
                 node.Color = item.Status switch { 0 => "red", 1 => "green", 2 => "blue", _ => "black" };
@@ -107,19 +112,92 @@ namespace Demo.Pages
             //node.Group = $"{groupA}";
             //node.Color = "orange";
 
-            MapD3.Data = Data;
+            return result;
         }
 
-        private async Task OnNodeClick(D3Node node)
+        private D3Data BuildTree()
         {
-            var json = JsonSerializer.Serialize(node, new JsonSerializerOptions { WriteIndented = true });
-            NodeJson = json;
-            await Task.CompletedTask;
+            var result = new D3Data();
+
+            var items = (new[] {
+                new {
+                    Code = root,
+                    Label = "Root",
+                    Parent = Guid.Empty,
+                    Description = "Descrizione",
+                    Status = 0,
+                    Header = "header",
+                    Footer = "footer"
+                }
+            }).ToList();
+
+            for (var p = 0; p < rnd.Next(10); p++)
+            {
+                parent = Guid.NewGuid();
+
+                items.Add(new
+                {
+                    Code = parent,
+                    Label = $"Parent {p}",
+                    Parent = root,
+                    Description = "Descrizione",
+                    Status = 1,
+                    Header = (string)null,
+                    Footer = (string)null
+                });
+
+                for (var c = 0; c < rnd.Next(10); c++)
+                {
+                    child = Guid.NewGuid();
+
+                    items.Add(new
+                    {
+                        Code = child,
+                        Label = $"Child {c}",
+                        Parent = parent,
+                        Description = "Descrizione",
+                        Status = 2,
+                        Header = (string)null,
+                        Footer = (string)null
+                    });
+                }
+            }
+
+            D3Node node;
+
+            foreach (var item in items)
+            {
+                node = result.AddNode(item.Code.ToString(), item.Parent.ToString());
+                node.Label = item.Label;
+                node.Tooltip = item.Label + " - " + item.Description;
+                node.Color = item.Status switch { 0 => "red", 1 => "green", 2 => "blue", _ => "black" };
+                node.Header = item.Header;
+                node.Footer = item.Footer;
+            }
+
+            return result;
+        }
+
+        private async Task OnClearClick(dynamic e)
+        {
+            await MapD3.Clear(); 
+        }
+
+        private async Task OnTreeClick(dynamic e)
+        {
+            await MapD3.Clear();
+
+            Data = BuildTree();
+            MapD3.Data = Data;
+
+            await MapD3.Update();
         }
 
         private async Task OnRootClick(dynamic e)
         {
-            var data = new TeraWord.Blazor.MapD3.D3Data();
+            await MapD3.Clear();
+
+            var data = new D3Data();
             var node = data.AddNode($"{root}");
 
             node.Label = "Root";
@@ -127,7 +205,8 @@ namespace Demo.Pages
             node.Color = 0 switch { 0 => "red", 1 => "green", 2 => "blue", _ => "black" };
             node.Icon = "archive";
 
-            MapD3.Data = data;
+            Data = data;
+            MapD3.Data = Data;
 
             await MapD3.Update();
         }
@@ -150,6 +229,13 @@ namespace Demo.Pages
             MapD3.Data = Data;
 
             await MapD3.Update();
+        }
+
+        private async Task OnNodeClick(D3Node node)
+        {
+            var json = JsonSerializer.Serialize(node, new JsonSerializerOptions { WriteIndented = true });
+            NodeJson = json;
+            await Task.CompletedTask;
         }
 
         private string RndIcon
@@ -216,7 +302,7 @@ namespace Demo.Pages
             {
                 Data.Nodes.Remove(node);
                 child = Guid.Parse(Data.Nodes.LastOrDefault()?.Code ?? Guid.Empty.ToString());
-               
+
                 MapD3.Data = Data;
 
                 await MapD3.Update();
@@ -228,7 +314,7 @@ namespace Demo.Pages
             await MapD3.ZoomToFit();
         }
 
-        private string NewColor
+        private string RndColor
         {
             get
             {
@@ -240,7 +326,7 @@ namespace Demo.Pages
         {
             groupA = Guid.NewGuid();
             var group = Data.AddGroup($"{groupA}");
-            group.Color = NewColor;
+            group.Color = RndColor;
 
             child = Guid.NewGuid();
 
@@ -270,12 +356,12 @@ namespace Demo.Pages
 
         private async Task OnLinkDistanceChange(dynamic e)
         {
-           await MapD3.SetLinkDistance(int.Parse(e.Value));
+            await MapD3.SetLinkDistance(int.Parse(e.Value));
         }
 
         private async Task OnLinkLengthsChange(dynamic e)
         {
-           await MapD3.SetLinkLengths(int.Parse(e.Value));
+            await MapD3.SetLinkLengths(int.Parse(e.Value));
         }
     }
 }

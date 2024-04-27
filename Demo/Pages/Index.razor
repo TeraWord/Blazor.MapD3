@@ -1,5 +1,7 @@
 ﻿@page "/"
 
+@namespace Demo.Pages
+
 <h1>TeraWord MapD3 @(typeof(D3Map).Assembly.GetName().Version.ToString(3))</h1>
 
 <div style="border:1px solid silver;height:600px;">
@@ -14,6 +16,8 @@
 
 <br />
 
+<button class="btn btn-primary" @onclick=OnClearClick>clear</button>
+<button class="btn btn-primary" @onclick=OnTreeClick>tree</button>
 <button class="btn btn-primary" @onclick=OnRootClick>root</button>
 <button class="btn btn-primary" @onclick=OnParentClick>parent</button>
 <button class="btn btn-primary" @onclick=OnChildClick>child</button>
